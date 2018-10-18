@@ -20,6 +20,6 @@ where
 \deqn{J(x) = d/dx logit(x).}
 }
 \examples{
-jac.logit(1)
+jac.invlogit(1)
 
 }

@@ -16,7 +16,6 @@
 #' jac.logit(1)
 #' 
 jac.logit = function(x, log = TRUE) {
-  # Jacobian for the logit transformation
   res = x - 2 * log(exp(x) + 1)
   if(log) { res } else { exp(res) }
 }
@@ -37,10 +36,9 @@ jac.logit = function(x, log = TRUE) {
 #' @param log TRUE to return \eqn{log(J(x))}
 #' 
 #' @examples 
-#' jac.logit(1)
+#' jac.invlogit(1)
 #' 
 jac.invlogit = function(x, log = TRUE) {
-  # Jacobian for the inverse logit transformation
   res = - ( log(x) + log(1-x) )
   if(log) { res } else { exp(res) }
 }
@@ -64,7 +62,6 @@ jac.invlogit = function(x, log = TRUE) {
 #' jac.log(1)
 #' 
 jac.log = function(x, log = TRUE) {
-  # Jacobian for the log transformation
   if(log) { x } else { exp(x) }
 }
 
@@ -87,6 +84,5 @@ jac.log = function(x, log = TRUE) {
 #' jac.exp(1)
 #' 
 jac.exp = function(x, log = TRUE) {
-  # Jacobian for the log transformation
   if(log) { -log(x) } else { 1/x }
 }

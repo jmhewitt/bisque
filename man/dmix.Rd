@@ -4,7 +4,7 @@
 \alias{dmix}
 \title{Evaluate a mixture density}
 \usage{
-dmix(x, f, pars, wts, log = FALSE, ...)
+dmix(x, f, params, wts, log = FALSE, ...)
 }
 \arguments{
 \item{x}{Points at which the mixture should be evaluated.  If the density 
@@ -15,8 +15,8 @@ points at which the mixture should be evaluated.}
 should include a arguments \code{x}, \code{params}, and \code{log}, the
 last of which returns \eqn{log(f(x))}.}
 
-\item{pars}{Matrix in which each row contains parameters for \code{f}.  The 
-number of rows in \code{pars} should match the number of mixture
+\item{params}{Matrix in which each row contains parameters for \code{f}.  The 
+number of rows in \code{params} should match the number of mixture
 components to evaluate.}
 
 \item{wts}{vector of weights for each mixture component}
