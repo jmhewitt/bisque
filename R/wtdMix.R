@@ -116,9 +116,7 @@ wtdMix = function(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
     theta2 = as.numeric(itx(grid$nodes[i,]))
     mix[i,] = param(theta2)
     wts[i] = f2(theta2, log = TRUE) + sum(logjac(grid$nodes[i,])) - grid$d[i]
-    if(w.mod == TRUE) { 
-      wts[i] = wts[i] + mix[i,ncol(mix)]
-    }
+    if(w.mod == TRUE) { wts[i] = wts[i] + mix[i,ncol(mix)] }
   }
   
   # normalize weights
