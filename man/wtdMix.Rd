@@ -5,7 +5,7 @@
 \title{Assemble a weighted mixture of posteriors}
 \usage{
 wtdMix(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
-  control = NULL)
+  control = NULL, ...)
 }
 \arguments{
 \item{f1}{evaluates f(theta1 | X, theta2).  f1 must be defined as 
@@ -14,7 +14,7 @@ f1 = function(theta1, params, log, ...).
   \item{theta1}{a matrix of parameters at which to evaluate 
     f(theta1 | X, theta2). each row should be one set of values at which 
     the density should be evaluated}
-  \item{par}{a vector of parameters needed to evaluate 
+  \item{param}{a vector of parameters needed to evaluate 
     f(theta1 | X, theta2).  In most cases par will equal theta2, but in 
     some cases, f(theta1 | X, theta2) depends on functions of theta2, 
     which can be precomputed (to save time) as the weighted mixture 
@@ -54,6 +54,8 @@ of lists:
   \item{f2}{(default) list(method='BFGS', maxit=5e4)
   }
 }}
+
+\item{...}{additional arguments to pass to f1, f2, param}
 }
 \description{
 Assemble a weighted mixture of posteriors

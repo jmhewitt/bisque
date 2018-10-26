@@ -5,7 +5,7 @@
 \title{Compute integration constants for unnormalized densities}
 \usage{
 kCompute(f, init, method = "BFGS", maxit = 10000, level = 2,
-  log = FALSE, ...)
+  log = FALSE, link = NULL, ...)
 }
 \arguments{
 \item{f}{Unnormalized density for which to compute a scaled integration
@@ -24,8 +24,21 @@ underlying 1D quadrature rule) [description from mvQuad::createNIGrid]}
 
 \item{log}{TRUE to return log of integration constant}
 
+\item{link}{character vector that specifies transformations used during 
+optimization and integration of f(theta2 | X).  while theta2 may be 
+defined on arbitrary support, \code{wtdMix} performs optimization and 
+integration of theta2 on an unconstrained support.  the \code{link} 
+vector describes the transformations that must be applied to each 
+element of theta2.  Jacobian functions for the transformations will 
+automatically be added to the optimization and integration routines.
+currently supported link functions are 'log', 'logit', and 'identity'.}
+
 \item{...}{additional arguments to pass to \code{f}}
 }
 \description{
 Compute integration constants for unnormalized densities
+}
+\examples{
+kCompute(dgamma, init = 1, shape=2, link='log', level = 5)
+
 }

@@ -9,7 +9,7 @@
 #'     \item{theta1}{a matrix of parameters at which to evaluate 
 #'       f(theta1 | X, theta2). each row should be one set of values at which 
 #'       the density should be evaluated}
-#'     \item{par}{a vector of parameters needed to evaluate 
+#'     \item{param}{a vector of parameters needed to evaluate 
 #'       f(theta1 | X, theta2).  In most cases par will equal theta2, but in 
 #'       some cases, f(theta1 | X, theta2) depends on functions of theta2, 
 #'       which can be precomputed (to save time) as the weighted mixture 
@@ -42,9 +42,10 @@
 #'     \item{f2}{(default) list(method='BFGS', maxit=5e4)
 #'     }
 #'   }
+#' @param ... additional arguments to pass to f1, f2, param
 #' 
 wtdMix = function(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
-                  control = NULL) {
+                  control = NULL, ...) {
   
   # default is identity links
   if(is.null(link)) {
@@ -95,7 +96,7 @@ wtdMix = function(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
   
   # find posterior mode for f(theta2 | X) on transformed scale
   f2.mode = optim(par = tx(f2.init), fn = function(par) {
-    f2(itx(par), log = TRUE) + sum(logjac(par))
+    f2(itx(par), log = TRUE, ...) + sum(logjac(par))
   }, method = control$f2$method, 
      control = list(fnscale = -1, maxit = control$f2$maxit), hessian = TRUE)
   
@@ -104,18 +105,20 @@ wtdMix = function(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
   }
   
   # create integration grid
-  grid = createLocScaleGrid(mu = f2.mode$par, prec = -f2.mode$hessian)
+  grid = createLocScaleGrid(mu = f2.mode$par, prec = -f2.mode$hessian, 
+                            level = level)
   
   # precompute parameters and weights for posterior mixture for theta1
   # TODO: don't double compute p0
   # TODO: allow some of the internal state to be used to evaluate param(.) ?
-  p0 = param(itx(grid$nodes[1,]))
+  
+  p0 = param(itx(grid$nodes[1,]), ...)
   mix = matrix(NA, nrow = nrow(grid$nodes), ncol = length(p0))
   wts = numeric(nrow(mix))
   for(i in 1:nrow(mix)) {
     theta2 = as.numeric(itx(grid$nodes[i,]))
-    mix[i,] = param(theta2)
-    wts[i] = f2(theta2, log = TRUE) + sum(logjac(grid$nodes[i,])) - grid$d[i]
+    mix[i,] = param(theta2, ...)
+    wts[i] = f2(theta2, log = TRUE, ...) + sum(logjac(grid$nodes[i,])) - grid$d[i]
     if(w.mod == TRUE) { wts[i] = wts[i] + mix[i,ncol(mix)] }
   }
   
@@ -126,7 +129,7 @@ wtdMix = function(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
   # build and return weighted marginal posterior
   list(
     f = function(theta1, log = FALSE) {
-      dmix(x = theta1, f = f1, params = mix, wts = wts, log = log)
+      dmix(x = theta1, f = f1, params = mix, wts = wts, log = log, ...)
     },
     mix = mix,
     wts = wts
