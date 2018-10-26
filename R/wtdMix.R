@@ -58,45 +58,9 @@ wtdMix = function(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
     control$f2 = list( method = 'BFGS', maxit = 5e4)
   }
   
-  # function to apply link transformations
-  tx = function(x) {
-    for(i in 1:length(link)) {
-      x[i] = switch (link[i],
-                     'identity' = x,
-                     'log' = log(x[i]),
-                     'logit' = qlogis(x[i])
-      )
-    }
-    x
-  }
-  
-  # function to invert link transformations
-  itx = function(x) {
-    for(i in 1:length(link)) {
-      x[i] = switch (link[i],
-                     'identity' = x,
-                     'log' = exp(x[i]),
-                     'logit' = plogis(x[i])
-      )
-    }
-    x
-  }
-  
-  # function to apply jacobians for link transformations
-  logjac = function(x) {
-    for(i in 1:length(link)) {
-      x[i] = switch (link[i],
-                     'identity' = 0,
-                     'log' = jac.log(x[i], log = TRUE),
-                     'logit' = jac.logit(x[i], log = TRUE)
-      )
-    }
-    x
-  }
-  
   # find posterior mode for f(theta2 | X) on transformed scale
-  f2.mode = optim(par = tx(f2.init), fn = function(par) {
-    f2(itx(par), log = TRUE, ...) + sum(logjac(par))
+  f2.mode = optim(par = tx(f2.init, link), fn = function(par) {
+    f2(itx(par, link), log = TRUE, ...) + sum(logjac(par, link))
   }, method = control$f2$method, 
      control = list(fnscale = -1, maxit = control$f2$maxit), hessian = TRUE)
   
@@ -112,13 +76,14 @@ wtdMix = function(f1, f2, f2.init, param, w.mod = FALSE, link = NULL, level = 2,
   # TODO: don't double compute p0
   # TODO: allow some of the internal state to be used to evaluate param(.) ?
   
-  p0 = param(itx(grid$nodes[1,]), ...)
+  p0 = param(itx(grid$nodes[1,], link), ...)
   mix = matrix(NA, nrow = nrow(grid$nodes), ncol = length(p0))
   wts = numeric(nrow(mix))
   for(i in 1:nrow(mix)) {
-    theta2 = as.numeric(itx(grid$nodes[i,]))
+    theta2 = as.numeric(itx(grid$nodes[i,], link))
     mix[i,] = param(theta2, ...)
-    wts[i] = f2(theta2, log = TRUE, ...) + sum(logjac(grid$nodes[i,])) - grid$d[i]
+    wts[i] = f2(theta2, log = TRUE, ...) + sum(logjac(grid$nodes[i,], link)) - 
+      grid$d[i]
     if(w.mod == TRUE) { wts[i] = wts[i] + mix[i,ncol(mix)] }
   }
   

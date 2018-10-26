@@ -34,45 +34,9 @@ kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
     link = rep('identity', length(init))
   }
   
-  # function to apply link transformations
-  tx = function(x) {
-    for(i in 1:length(link)) {
-      x[i] = switch (link[i],
-                     'identity' = x[i],
-                     'log' = log(x[i]),
-                     'logit' = qlogis(x[i])
-      )
-    }
-    x
-  }
-  
-  # function to invert link transformations
-  itx = function(x) {
-    for(i in 1:length(link)) {
-      x[i] = switch (link[i],
-                     'identity' = x[i],
-                     'log' = exp(x[i]),
-                     'logit' = plogis(x[i])
-      )
-    }
-    x
-  }
-  
-  # function to apply jacobians for link transformations
-  logjac = function(x) {
-    for(i in 1:length(link)) {
-      x[i] = switch (link[i],
-                     'identity' = 0,
-                     'log' = jac.log(x[i], log = TRUE),
-                     'logit' = jac.logit(x[i], log = TRUE)
-      )
-    }
-    x
-  }
-  
   # find the density's mode
-  mode = optim(par = tx(init), fn = function(par, ...) {
-    f(itx(par), log = TRUE, ...) + sum(logjac(par))
+  mode = optim(par = tx(init, link), fn = function(par, ...) {
+    f(itx(par, link), log = TRUE, ...) + sum(logjac(par, link))
   }, method = method, control = list(fnscale = -1, maxit=maxit), 
   hessian = TRUE, ...)
   
@@ -86,7 +50,7 @@ kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
   
   # evaluate the unnormalized log-density at integration points
   lnf = apply(grid$nodes, 1, function(x){
-    f(itx(x), log = TRUE, ...) + sum(logjac(x)) })
+    f(itx(x, link), log = TRUE, ...) + sum(logjac(x, link)) })
   lnf = lnf - grid$d
 
   # initialize return with scaled integration constant
