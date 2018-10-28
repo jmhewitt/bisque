@@ -114,7 +114,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
     g(itx(par, w.link), log = TRUE, ...) + sum(logjac(par, w.link))
   }, method = w.control$method, hessian = TRUE,
   control = list(fnscale = -1,  maxit = w.control$maxit))
-
+  
   # check convergence
   if(g.mode$convergence != 0) { warning('Mode for w may not have been found.') }
   
@@ -124,18 +124,23 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
     f2.prec = - g.mode$hessian
     f2.link = w.link
   } else {
-    f2.mode = g.mode$par[w$theta2.inds]
-    L1 = matrix(- g.mode$hessian[-w$theta2.inds, -w$theta2.inds],
-                nrow = nrow(g.mode$hessian) - length(w$theta2.inds))
-    L2 = matrix(- g.mode$hessian[w$theta2.inds, w$theta2.inds],
-                nrow = length(w$theta2.inds))
-    L12 = matrix(- g.mode$hessian[-w$theta2.inds, w$theta2.inds],
-                 ncol = length(w$theta2.inds))
-    f2.prec =  L2 - t(L12) %*% solve(L1) %*% L12
-    f2.link = w.link[w$theta2.inds]
+    if(!is.na(w$theta2.inds)) {
+      f2.mode = g.mode$par[w$theta2.inds]
+      L1 = matrix(- g.mode$hessian[-w$theta2.inds, -w$theta2.inds],
+                  nrow = nrow(g.mode$hessian) - length(w$theta2.inds))
+      L2 = matrix(- g.mode$hessian[w$theta2.inds, w$theta2.inds],
+                  nrow = length(w$theta2.inds))
+      L12 = matrix(- g.mode$hessian[-w$theta2.inds, w$theta2.inds],
+                   ncol = length(w$theta2.inds))
+      f2.prec =  L2 - t(L12) %*% solve(L1) %*% L12
+      f2.link = w.link[w$theta2.inds]
+    } else {
+      f2.mode = g.mode$par
+      f2.prec = - g.mode$hessian
+      f2.link = w.link
+    }
   }
-
-
+  
   #
   # develop weighted mixtures approximation
   #
@@ -188,6 +193,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
       dmix(x = theta1, f = h, params = mix, wts = wts, log = log, ...)
     },
     mix = mix,
-    wts = wts
+    wts = wts,
+    mode = g.mode
   )
 }
