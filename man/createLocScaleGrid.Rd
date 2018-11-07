@@ -13,10 +13,17 @@ createLocScaleGrid(mu = 0, prec = 1, level = 2)
 building a sparse integration grid for a density, \code{prec} is often 
 the negative of the hessian at the mode.}
 
-\item{level}{accuracy level (typically number of grid points for the 
-underlying 1D quadrature rule) [description from mvQuad::createNIGrid]}
+\item{level}{accuracy level.  This is typically number of grid points for the 
+underlying 1D quadrature rule.  [description from mvQuad::createNIGrid]}
 }
 \description{
 Enhances mvQuad::createNIGrid by shifting and scaling a sparse integration
 grid, and evaluating the weight function at each of the grid nodes.
+}
+\examples{
+g = createLocScaleGrid(mu = c(1,0), prec = diag(c(1,.5)), level = 2 )
+
+}
+\seealso{
+\code{\link{mvQuad::createNIGrid}}
 }

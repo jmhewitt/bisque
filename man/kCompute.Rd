@@ -2,14 +2,14 @@
 % Please edit documentation in R/kCompute.R
 \name{kCompute}
 \alias{kCompute}
-\title{Compute integration constants for unnormalized densities}
+\title{Use sparse grid quadrature techniques to integrate (unnormalized) densities}
 \usage{
 kCompute(f, init, method = "BFGS", maxit = 10000, level = 2,
-  log = FALSE, link = NULL, ...)
+  log = FALSE, link = NULL, lower = -Inf, upper = Inf, ...)
 }
 \arguments{
-\item{f}{Unnormalized density for which to compute a scaled integration
-constant.  the function \eqn{f} should include an argument \code{log}, 
+\item{f}{(Unnormalized) density to integrate.
+the function \eqn{f} should include an argument \code{log}, 
 which returns \eqn{log(f(x))}.}
 
 \item{init}{Initial guess for the density's mode}
@@ -36,7 +36,9 @@ currently supported link functions are 'log', 'logit', and 'identity'.}
 \item{...}{additional arguments to pass to \code{f}}
 }
 \description{
-Compute integration constants for unnormalized densities
+This function integrates (unnormalized) densities and may be used to compute
+integration constants for unnormalized densities, or to marginalize a 
+joint density, for example.
 }
 \examples{
 kCompute(dgamma, init = 1, shape=2, link='log', level = 5)

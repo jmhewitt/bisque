@@ -1,10 +1,13 @@
-#' Compute integration constants for unnormalized densities
+#' Use sparse grid quadrature techniques to integrate (unnormalized) densities
 #'
+#' This function integrates (unnormalized) densities and may be used to compute
+#' integration constants for unnormalized densities, or to marginalize a 
+#' joint density, for example.
 #' 
 #' @export
 #' 
-#' @param f Unnormalized density for which to compute a scaled integration
-#'   constant.  the function \eqn{f} should include an argument \code{log}, 
+#' @param f (Unnormalized) density to integrate.
+#'   the function \eqn{f} should include an argument \code{log}, 
 #'   which returns \eqn{log(f(x))}.
 #' @param init Initial guess for the density's mode
 #' @param maxit maximum number of iterations \code{optim} should use in 
@@ -27,7 +30,7 @@
 #' kCompute(dgamma, init = 1, shape=2, link='log', level = 5)
 #' 
 kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
-                    link = NULL, ...) {
+                    link = NULL, lower = -Inf, upper = Inf, ...) {
   
   # default is identity links
   if(is.null(link)) {
@@ -38,7 +41,7 @@ kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
   mode = optim(par = tx(init, link), fn = function(par, ...) {
     f(itx(par, link), log = TRUE, ...) + sum(logjac(par, link))
   }, method = method, control = list(fnscale = -1, maxit=maxit), 
-  hessian = TRUE, ...)
+  hessian = TRUE, lower = lower, upper = upper, ...)
   
   # warn if optimization failed
   if(mode$convergence != 0) {

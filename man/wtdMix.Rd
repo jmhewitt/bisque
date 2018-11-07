@@ -2,62 +2,146 @@
 % Please edit documentation in R/wtdMix.R
 \name{wtdMix}
 \alias{wtdMix}
-\title{Assemble a weighted mixture of posteriors}
+\title{Develop a weighted mixture of posteriors}
 \usage{
 wtdMix(f1, f1.precompute = function(x, ...) {     x }, f2,
   w = "direct", w.init, w.link = NULL, level = 2, w.control = NULL,
   ...)
 }
 \arguments{
-\item{f1}{evaluates f(theta1 | X, theta2).  f1 must be defined as
-f1 = function(theta1, params, log, ...).
+\item{f1}{evaluates \eqn{f(\theta_1 | X, \theta_2)}.  \code{f1} must be able
+to be called via \code{f1(theta1, params, log, ...)}.
 \describe{
-  \item{theta1}{a matrix of parameters at which to evaluate
-    f(theta1 | X, theta2). each row should be one set of values at which
-    the density should be evaluated}
-  \item{param}{a vector of parameters needed to evaluate
-    f(theta1 | X, theta2).  In most cases par will equal theta2, but in
-    some cases, f(theta1 | X, theta2) depends on functions of theta2,
-    which can be precomputed (to save time) as the weighted mixture
-    approximation is constructed.}
-  \item{log}{TRUE to return log(f(theta1 | X, theta2))}
+  \item{\code{theta1}}{a matrix of parameters at which to evaluate
+    \eqn{f(\theta_1 | X, \theta_2)}. each row should be one set of values
+    at which the density should be evaluated}
+  \item{params}{a vector of parameters needed to evaluate
+    \eqn{f(\theta_1 | X, \theta_2)}.  In most cases \code{params} will
+    equal \eqn{theta_2}, but in some cases, \eqn{f(\theta_1 | X, \theta_2)}
+    depends on functions of \eqn{\theta_2}, which can be pre-evaluated
+    as the weighted mixture approximation is constructed.}
+  \item{log}{TRUE to return \eqn{ln(f(\theta_1 | X, \theta_2))}}
   \item{...}{additional arguments needed for function evaluation}
 }}
 
 \item{f1.precompute}{function that pre-computes parameters for evaluating
-f(theta1 | X, theta2).  param must be defined as param = function(theta2).}
+\eqn{f(\theta_1 | X, \theta_2)}.  \code{f1.precompute} must be able to
+be called via \code{f1.precompute(theta2, ...)} and return the argument
+\code{params} for the function \code{f1}.}
 
-\item{f2}{evaluates f(theta2 | X).  f2 must be defined as
-f2 = function(theta2, log, ...).  The interpretation of these arguments
-is the same as for f1}
+\item{f2}{evaluates \eqn{f(theta_2 | X)}.  \code{f2} must be able to be
+called via \code{f2(theta2, log, ...)}.}
 
-\item{w}{TRUE if the last element in the vector returned by the param
-function should be added to the log-weights before they are normalized
-before they are normalized.  should be a function of theta2}
+\item{w}{Argument that specifies how the posterior mode of
+\eqn{f(\theta_2| X)} should be evaluated.  The options for \code{w} are
+described below.
+\describe{
+  \item{\code{'direct'}}{Instructs \code{wtdMix} to optimize \eqn{f2}
+    directly, after applying link function transformations to the
+    parameters \eqn{\theta_2}.}
+  \item{\code{list()}}{Instructs \code{wtdMix} to determine the posterior
+    mode of \eqn{f(\theta_2 | X)} using a function that is proportional,
+    or otherwise a major component of \eqn{f(\theta_2 | X)}.  The list
+    must specify the following arguments:
+    \describe{
+      \item{\code{f12}}{Function that is informative of
+        \eqn{f(\theta_2 | X)} that will be optimized.  For example,
+        \code{f12} may include components of \eqn{f(\theta_2 | X)}, or it
+        may be proportional to the joint posterior distribution
+        \eqn{f(\theta_1, \theta_2 | X)}.  \code{f12} must be able to be
+        called via \code{f12(theta12, log, ...)}.}
+      \item{\code{theta2.inds}}{After optimizing \code{f12}, \code{wtdMix}
+        will use the hessian at the mode to develop a gaussian
+        approximation to \code{f12}.  The argument \code{theta2.inds}
+        specifies the indices of \code{theta12} that correspond to
+        \eqn{\theta_2}.  \code{wtdMix} will integrate out the
+        non-\eqn{\theta_2} indices from the Gaussian approximation to
+        \code{f12}.}
+      \item{\code{f1.init}}{It is assumed that
+        \eqn{f(\theta_1|\theta_2, X)} is not known exactly if \code{f12}
+        is used.  \code{wtdMix} will determine an integration constant for
+        \eqn{f(\theta_1|\theta_2, X)} in this case by using numerical
+        integration around the mode of the function.  \code{f1.init}
+        specifies the initial guess for the mode.}
+      \item{\code{f1.link}}{The integration of \code{f1} will be done on
+        a transformed scale.  \code{f1.link} is a character vector that
+        specifies the transformations to use.}
+       \item{\code{f1.control}}{Passes arguments to \code{optim} to
+        determine the optimization scheme used.}
+       \item{\code{f1.level}}{Determines the quality of the approximate
+        integration.  Higher numbers are more accurate approximations.}
+    }
+   }
+}}
 
-\item{w.init}{initial guess for mode of f(theta2 | X)}
+\item{w.init}{initial guess for mode of \eqn{f(\theta_2 | X)}.  Default is
+\code{'identity'} for all parameters.}
+
+\item{w.link}{character vector that specifies transformations used during
+optimization and integration of \eqn{f(\theta_2 | X)}.  While
+\eqn{\theta_2} may be defined on arbitrary support, \code{wtdMix} performs
+optimization and integration of \eqn{\theta_2} on an unconstrained support.
+The \code{link} vector describes the transformations that must be applied
+to each element of \eqn{\theta_2}.  Jacobian functions for the
+transformations will automatically be added to the optimization and
+integration routines. Currently supported link functions are \code{'log'},
+\code{'logit'}, and \code{'identity'}.}
 
 \item{level}{accuracy level (typically number of grid points for the
 underlying 1D quadrature rule) [description from mvQuad::createNIGrid]}
 
-\item{...}{additional arguments to pass to f1, f2, param}
+\item{w.control}{Limited list of options to pass to optim.}
 
-\item{f2.link}{character vector that specifies transformations used during
-optimization and integration of f(theta2 | X).  while theta2 may be
-defined on arbitrary support, \code{wtdMix} performs optimization and
-integration of theta2 on an unconstrained support.  the \code{link}
-vector describes the transformations that must be applied to each
-element of theta2.  Jacobian functions for the transformations will
-automatically be added to the optimization and integration routines.
-currently supported link functions are 'log', 'logit', and 'identity'.}
-
-\item{control}{limited list of options to pass to optim.  should be a list
-of lists:
-\describe{
-  \item{w}{(default) list(method='BFGS', maxit=5e4)
+\item{...}{Additional arguments to pass to \code{f1}, \code{f1.precompute},
+\code{f12}, and \code{f2}.}
+}
+\value{
+A list with class \code{wtdMix}, which contains the following items.
+  \describe{
+    \item{\code{f}}{Function for evaluating the posterior density
+     \eqn{f(\theta_1|X)}.  \code{f} is callable  via
+     \code{f(theta1, log, ...)}.}
+    \item{\code{mix}}{A matrix containing the pre-computed parameters for
+      evaluating the mixture components \eqn{f(\theta_1 | \theta_2, X)}.
+      Each row of the matrix contains parameters for one of the \eqn{K}
+      mixture components.}
+    \item{\code{wts}}{Integration weights for each of the mixture components.
+      Some of the weights may be negative.}
+    \item{\code{expectation}}{List containing additional tools for computing
+      posterior expectations of \eqn{f(\theta_2|X)}.  However, posterior 
+      expectations of \eqn{f(\theta_1|X)} can also be computed when 
+      expectations of \eqn{f(\theta_1|\theta_2, X)} are known.  The elements
+      of \code{expectation} are
+      \describe{
+        \item{\code{Eh}}{Function to compute \eqn{E[h(\theta_2)|X]}.  
+          \code{Eh} is callable via \code{Eh(h, ...)}, where \code{h} is a
+          function callable via \code{h(theta2, ...)} and \code{...} are 
+          additional arguments to the function.  The function \code{h} is  
+          evaluated at the quadrature nodes \eqn{\theta_2^{(j)}}.}
+        \item{\code{Eh.precompute}}{Exactly the same idea as \code{Eh}, but
+          the function \code{h} is evalauted at the quadrature nodes after 
+          being passed through the function \code{f1.precompute}.}
+        \item{\code{grid}}{The sparse-quadrature integration grid used.  
+          Helpful for seeing the quadrature nodes \eqn{\theta_2^{(j)}}.}
+        \item{\code{wts}}{The integration weights for approximating the 
+          expectation \eqn{E[h]}.  Note that these integration weights may
+          differ from the main integration weights for evaluating the 
+          posterior density \eqn{f(\theta_1|X)}.}
+      }}
   }
-}}
 }
 \description{
-Assemble a weighted mixture of posteriors
+For a Bayesian model
+\deqn{ X ~ f(X | \theta_1, \theta_2)}
+\deqn{ (\theta_1, \theta_2) ~ f(\theta_1, \theta_2),}
+the marginal  posterior \eqn{f(\theta_1 | X)} distribution can be
+approximated via weighted mixtures via
+\deqn{ f(\theta_1 | X) \approx \sum_{j=1}^K f(\theta_1 | X, \theta_2) w_j }
+where \eqn{w_j} is based on \eqn{f(\theta_2^{(j)} | X)} and weights
+\eqn{\tilde w_j}, where \eqn{\theta_2^{(j)}} and \eqn{\tilde w_j} are
+nodes and weights for a sparse-grid quadrature integration scheme.
+The quadrature rule is developed by finding the posterior mode of
+\eqn{f(\theta_2|X)}, after transforming \eqn{\theta_2} to an unconstrained
+support.  For best results, \eqn{\theta_2} should be a continuous random
+variable, or be able to be approximated by one.
 }

@@ -11,20 +11,57 @@ dmix(x, f, params, wts, log = FALSE, ...)
 is multivariate, then each row of \code{x} should contain one set of 
 points at which the mixture should be evaluated.}
 
-\item{f}{Unnormalized density used in the mixture. The function \eqn{f} 
-should include a arguments \code{x}, \code{params}, and \code{log}, the
-last of which returns \eqn{log(f(x))}.}
+\item{f}{Density used in the mixture. The function should be defined so it 
+is can be called via \code{f(x, params, log, ...)}.  The density \eqn{f}
+is evaluated at the points in \code{x} using one set of parameters 
+\code{params}, i.e., for some specific \eqn{\theta^{(k)}}.
+if \code{log==TRUE}, then \eqn{ln(f)} is returned.  Additional parameters
+may be passed to \eqn{f} via \code{...}.}
 
-\item{params}{Matrix in which each row contains parameters for \code{f}.  The 
-number of rows in \code{params} should match the number of mixture
-components to evaluate.}
+\item{params}{Matrix in which each row contains parameters that define
+\eqn{f}.  The number of rows in \code{params} should match the number of 
+mixture components \eqn{k}.}
 
 \item{wts}{vector of weights for each mixture component}
 
 \item{log}{TRUE to return the log of the mixture density}
 
-\item{...}{additional parameters to be passed to \code{f}}
+\item{...}{additional arguments to be passed to \code{f}}
 }
 \description{
-Evaluate a mixture density
+Evaluates mixture densities of the form
+\deqn{f(x) = \sum_{j=1}^k f(x|\theta^{(k)}) w_k}
+where the \eqn{w_k} are (possibly negative) weights that sum to 1 and 
+\eqn{f(x|\theta^{(k)})} are densities that are specified via parameters
+\eqn{\theta^{(k)}}, which are passed in the function argument 
+\code{params}.
+A unique feature of this function is that it is able to evaluate mixture
+densities in which some of the mixture weights \eqn{w_k} are negative.
+}
+\examples{
+# evaluate mixture density at these locations
+x = seq(0, 1, length.out = 100)
+
+# density will be a mixture of beta distributions
+f = function(x, theta, log = FALSE) {
+  dbeta(x, shape1 = theta[1], shape2 = theta[2], log = log)
+}
+
+# beta parameters are randomly assigned
+params = matrix(exp(2*runif(10)), ncol=2)
+
+# mixture components are equally weighted
+wts = rep(1/nrow(params), nrow(params))
+
+# evaluate mixture density
+fmix = dmix(x = x, f = f, params = params, wts = wts)
+
+# plot mixture density
+plot(x, fmix, type='l', ylab = expression(f(x)), 
+     ylim = c(0, 4))
+
+# plot component densities
+for(i in 1:length(wts)){
+  curve(f(x, params[i,]), col = 2, add = TRUE)
+}
 }

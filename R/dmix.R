@@ -1,20 +1,33 @@
 #' Evaluate a mixture density
-#'
+#' 
+#' Evaluates mixture densities of the form
+#' \deqn{f(x) = \sum_{j=1}^k f(x|\theta^{(k)}) w_k}
+#' where the \eqn{w_k} are (possibly negative) weights that sum to 1 and 
+#' \eqn{f(x|\theta^{(k)})} are densities that are specified via parameters
+#' \eqn{\theta^{(k)}}, which are passed in the function argument 
+#' \code{params}.
+#' A unique feature of this function is that it is able to evaluate mixture
+#' densities in which some of the mixture weights \eqn{w_k} are negative.
 #' 
 #' @export
 #' 
 #' @param x Points at which the mixture should be evaluated.  If the density 
 #'   is multivariate, then each row of \code{x} should contain one set of 
 #'   points at which the mixture should be evaluated.
-#' @param f Unnormalized density used in the mixture. The function \eqn{f} 
-#'   should include a arguments \code{x}, \code{params}, and \code{log}, the
-#'   last of which returns \eqn{log(f(x))}.
-#' @param params Matrix in which each row contains parameters for \code{f}.  The 
-#'   number of rows in \code{params} should match the number of mixture
-#'   components to evaluate.
+#' @param f Density used in the mixture. The function should be defined so it 
+#'   is can be called via \code{f(x, params, log, ...)}.  The density \eqn{f}
+#'   is evaluated at the points in \code{x} using one set of parameters 
+#'   \code{params}, i.e., for some specific \eqn{\theta^{(k)}}.
+#'   if \code{log==TRUE}, then \eqn{ln(f)} is returned.  Additional parameters
+#'   may be passed to \eqn{f} via \code{...}.
+#' @param params Matrix in which each row contains parameters that define
+#'   \eqn{f}.  The number of rows in \code{params} should match the number of 
+#'   mixture components \eqn{k}.
 #' @param wts vector of weights for each mixture component
 #' @param log TRUE to return the log of the mixture density
-#' @param ... additional parameters to be passed to \code{f}
+#' @param ... additional arguments to be passed to \code{f}
+#' 
+#' @example examples/dmixEx.R
 #' 
 dmix = function(x, f, params, wts, log = FALSE, ...){
   

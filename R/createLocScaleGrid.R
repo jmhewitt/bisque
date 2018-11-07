@@ -11,8 +11,13 @@
 #' @param prec "precision matrix" associated with the integration grid.  When 
 #'   building a sparse integration grid for a density, \code{prec} is often 
 #'   the negative of the hessian at the mode.
-#' @param level accuracy level (typically number of grid points for the 
-#'   underlying 1D quadrature rule) [description from mvQuad::createNIGrid]
+#' @param level accuracy level.  This is typically number of grid points for the 
+#'   underlying 1D quadrature rule.  [description from mvQuad::createNIGrid]
+#'   
+#' @seealso \code{\link{mvQuad::createNIGrid}}
+#'   
+#' @examples 
+#' g = createLocScaleGrid(mu = c(1,0), prec = diag(c(1,.5)), level = 2 )
 #' 
 createLocScaleGrid = function(mu = 0, prec = 1, level = 2) {
   # determine standardized quadrature points
