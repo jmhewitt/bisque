@@ -14,6 +14,8 @@
 #' support.  For best results, \eqn{\theta_2} should be a continuous random
 #' variable, or be able to be approximated by one.
 #'
+#' @import foreach
+#' @importFrom itertools ichunk
 #'
 #' @export
 #'
@@ -94,6 +96,8 @@
 #' @param w.control Limited list of options to pass to optim.
 #' @param ... Additional arguments to pass to \code{f1}, \code{f1.precompute},
 #'   \code{f12}, and \code{f2}.
+#' @param ncores number of cores used to parallelize computation of parameters
+#'   for \eqn{f(\theta_1 | \theta_2, X)}.
 #'
 #' @return A list with class \code{wtdMix}, which contains the following items.
 #'   \describe{
@@ -131,7 +135,7 @@
 #'
 wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
                   w = 'direct', w.init, w.link = NULL, level = 2,
-                  w.control = NULL, ...) {
+                  w.control = NULL, ncores = 1, ...) {
 
   #
   # verify we can compute a gaussian approximation to f(theta2 | X)
@@ -241,39 +245,60 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
 
   # precompute parameters and weights for posterior mixture for theta1
   p0 = f1.precompute(itx(grid$nodes[1,], f2.link), ...)
-  mix = matrix(NA, nrow = nrow(grid$nodes), ncol = length(p0))
-  wts = numeric(nrow(mix))
-  wts.e = numeric(nrow(mix))
-  for(i in 1:nrow(mix)) {
+  nodes  = nrow(grid$nodes)
+  chunkSize = ceiling(nodes/ncores)
+  pc = foreach(inds = ichunk(1:nodes, chunkSize = chunkSize, mode = 'numeric'),
+               .combine = mergePars, 
+               .export = c('itx', 'logjac', 'kCompute')) %dopar% {
+                             
+    # initialize return objects
+    mix = matrix(NA, nrow = length(inds), ncol = length(p0))
+    wts = numeric(nrow(mix))
+    wts.e = numeric(nrow(mix))
+    C1 = numeric(nrow(mix))
+    nodes.backtransformed = grid$nodes[inds,]
 
-    # back-transform parameters
-    theta2 = as.numeric(itx(grid$nodes[i,], f2.link))
+    for(i in 1:nrow(mix)) {
+      # back-transform parameters
+      theta2 = as.numeric(itx(grid$nodes[inds[i],], f2.link))
 
-    # don't double-compute p0
-    if(i==1) { mix[i,] = p0 }
-    else { mix[i,] = f1.precompute(theta2, ...) }
+      # compute mixture parameters
+      mix[i,] = f1.precompute(theta2, ...)
 
-    # compute base weights
-    wts[i] = f2(theta2, log = TRUE, ...) +
-      sum(logjac(grid$nodes[i,], f2.link)) - grid$d[i]
+      # compute base weights
+      wts[i] = f2(theta2, log = TRUE, ...) +
+        sum(logjac(grid$nodes[inds[i],], f2.link)) - grid$d[inds[i]]
 
-    # compute weights for evaluating expectations in secondary analyses
-    wts.e[i] = wts[i]
+      # compute weights for evaluating expectations in secondary analyses
+      wts.e[i] = wts[i]
+      
+      # as necessary, compute C1(theta2) and update weights
+      if(w.approx == FALSE) {
+        C1[i] = kCompute(f = function(theta1, log = TRUE) {
+          res = f1(theta1, theta2, log = log, ...)
+          if(log) { res } else { exp(res) }
+        }, init = w$f1.init, log = TRUE, level = w$f1.level, link = w$f1.link,
+        method = w$f1.control$method)
+        wts[i] = wts[i] + C1[i]
+      }
 
-    # as necessary, compute C1(theta2) and update weights
-    if(w.approx == FALSE) {
-      C1[i] = kCompute(f = function(theta1, log = TRUE) {
-        res = f1(theta1, theta2, log = log, ...)
-        if(log) { res } else { exp(res) }
-      }, init = w$f1.init, log = TRUE, level = w$f1.level, link = w$f1.link,
-      method = w$f1.control$method)
-      wts[i] = wts[i] + C1[i]
+      # store back-transformed integration nodes in grid
+      nodes.backtransformed[i,] = theta2
     }
 
-    # store back-transformed integration nodes in grid
-    grid$nodes[i,] = theta2
+    # package results
+    list(mix = mix, wts = wts, wts.e = wts.e, C1 = C1,
+         nodes.backtransformed = nodes.backtransformed
+    )
   }
-
+  
+  # unwrap results
+  mix = pc$mix
+  wts = pc$wts
+  wts.e = pc$wts.e
+  C1 = pc$C1
+  grid$nodes = pc$nodes.backtransformed
+  
   # normalize weights
   wts = exp(wts - mean(wts)) * grid$weights
   wts = wts / sum(wts)

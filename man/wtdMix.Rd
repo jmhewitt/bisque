@@ -6,7 +6,7 @@
 \usage{
 wtdMix(f1, f1.precompute = function(x, ...) {     x }, f2,
   w = "direct", w.init, w.link = NULL, level = 2, w.control = NULL,
-  ...)
+  ncores = 1, ...)
 }
 \arguments{
 \item{f1}{evaluates \eqn{f(\theta_1 | X, \theta_2)}.  \code{f1} must be able
@@ -91,6 +91,9 @@ integration routines. Currently supported link functions are \code{'log'},
 underlying 1D quadrature rule) [description from mvQuad::createNIGrid]}
 
 \item{w.control}{Limited list of options to pass to optim.}
+
+\item{ncores}{number of cores used to parallelize computation of parameters
+for \eqn{f(\theta_1 | \theta_2, X)}.}
 
 \item{...}{Additional arguments to pass to \code{f1}, \code{f1.precompute},
 \code{f12}, and \code{f2}.}
