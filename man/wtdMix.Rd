@@ -6,7 +6,7 @@
 \usage{
 wtdMix(f1, f1.precompute = function(x, ...) {     x }, f2,
   w = "direct", w.init, w.link = NULL, level = 2, w.control = NULL,
-  ncores = 1, ...)
+  ncores = 1, quadError = TRUE, ...)
 }
 \arguments{
 \item{f1}{evaluates \eqn{f(\theta_1 | X, \theta_2)}.  \code{f1} must be able
@@ -94,6 +94,10 @@ underlying 1D quadrature rule) [description from mvQuad::createNIGrid]}
 
 \item{ncores}{number of cores used to parallelize computation of parameters
 for \eqn{f(\theta_1 | \theta_2, X)}.}
+
+\item{quadError}{TRUE if integration nodes and weight should be computed for
+the \code{level-1} integration grid, so that quadrature approximation
+error can be estimated.}
 
 \item{...}{Additional arguments to pass to \code{f1}, \code{f1.precompute},
 \code{f12}, and \code{f2}.}

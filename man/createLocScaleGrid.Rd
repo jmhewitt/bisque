@@ -4,7 +4,7 @@
 \alias{createLocScaleGrid}
 \title{Create a centered and scaled sparse integration grid}
 \usage{
-createLocScaleGrid(mu = 0, prec = 1, level = 2)
+createLocScaleGrid(mu = 0, prec = 1, level = 2, quadError = FALSE)
 }
 \arguments{
 \item{mu}{location at which grid should be centered}
@@ -15,6 +15,10 @@ the negative of the hessian at the mode.}
 
 \item{level}{accuracy level.  This is typically number of grid points for the 
 underlying 1D quadrature rule.  [description from mvQuad::createNIGrid]}
+
+\item{quadError}{provide additional information about the grid points and 
+integration weights for the quadrature rule with \code{level-1}.  This 
+information can facilitate approximating the quadrature error.}
 }
 \description{
 Enhances mvQuad::createNIGrid by shifting and scaling a sparse integration

@@ -98,6 +98,9 @@
 #'   \code{f12}, and \code{f2}.
 #' @param ncores number of cores used to parallelize computation of parameters
 #'   for \eqn{f(\theta_1 | \theta_2, X)}.
+#' @param quadError TRUE if integration nodes and weight should be computed for
+#'  the \code{level-1} integration grid, so that quadrature approximation
+#'  error can be estimated.
 #'
 #' @return A list with class \code{wtdMix}, which contains the following items.
 #'   \describe{
@@ -135,7 +138,7 @@
 #'
 wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
                   w = 'direct', w.init, w.link = NULL, level = 2,
-                  w.control = NULL, ncores = 1, ...) {
+                  w.control = NULL, ncores = 1, quadError = TRUE, ...) {
 
   #
   # verify we can compute a gaussian approximation to f(theta2 | X)
@@ -238,8 +241,9 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   #
 
   # create integration grid
-  grid = createLocScaleGrid(mu = f2.mode, prec = f2.prec, level = level)
-
+  grid = createLocScaleGrid(mu = f2.mode, prec = f2.prec, level = level,
+                            quadError = quadError)
+  
   # preallocate space for C1(theta2), as necessary
   if(w.approx == FALSE) { C1 = numeric(nrow(grid$nodes)) }
 
@@ -265,7 +269,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
       # compute mixture parameters
       mix[i,] = f1.precompute(theta2, ...)
 
-      # compute base weights
+      # compute base weights (i.e., the weight function ratios)
       wts[i] = f2(theta2, log = TRUE, ...) +
         sum(logjac(grid$nodes[inds[i],], f2.link)) - grid$d[inds[i]]
 
@@ -299,13 +303,17 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   C1 = pc$C1
   grid$nodes = pc$nodes.backtransformed
   
+  # standardize quadError weights before the main quadrature weights
+  if(quadError) {
+    grid$errorNodes$weights = grid$errorNodes$weights *
+      exp(wts[grid$errorNodes$inds]-mean(wts[grid$errorNodes$inds]))
+    grid$errorNodes$weights = 
+      grid$errorNodes$weights / sum(grid$errorNodes$weights)
+  }
+  
   # normalize weights
   wts = exp(wts - mean(wts)) * grid$weights
   wts = wts / sum(wts)
-
-  # normalize base weights for computing expectations
-  wts.e = exp(wts.e - mean(wts.e)) * grid$weights
-  wts.e = wts.e / sum(wts.e)
 
   # use C1(theta2) to build a second-layer function for dmix
   if(w.approx) { h = f1 }
@@ -320,16 +328,29 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
 
   # build and return weighted marginal posterior
   res = list(
-    f = function(theta1, log = FALSE, ...) {
-      dmix(x = theta1, f = h, params = mix, wts = wts, log = log, ...)
+    f = function(theta1, log = FALSE, quadError = FALSE, ...) {
+      if(quadError) {
+        dmix(x = theta1, f = h, params = mix[grid$errorNodes$inds,], 
+             wts = grid$errorNodes$weights, log = log, ...)
+      } else {
+        dmix(x = theta1, f = h, params = mix, wts = wts, log = log, ...)
+      }
     },
     mix = mix,
     wts = wts,
     expectation = list(
-      Eh = function(h, ...) { emix(h, grid$nodes, wts.e, ...) },
-      Eh.precompute = function(h, ...) { emix(h, mix, wts.e, ...) },
-      grid = grid,
-      wts = wts.e
+      Eh = function(h, quadError = FALSE, ...) { 
+        if(quadError) {
+          emix(h, grid$nodes[grid$errorNodes$inds,], 
+               grid$errorNodes$weights, ...)
+        } else { emix(h, grid$nodes, wts, ...) }
+      },
+      Eh.precompute = function(h, quadError = FALSE, ...) { 
+        if(quadError) {
+          emix(h, mix[grid$errorNodes$inds,], grid$errorNodes$weights, ...)
+        } else { emix(h, mix, wts, ...) }
+      },
+      grid = grid
     )
   )
   class(res) = 'wtdMix'
