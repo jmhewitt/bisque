@@ -4,7 +4,7 @@
 \alias{emix}
 \title{Compute expectations via weighted mixtures}
 \usage{
-emix(h, params, wts, ...)
+emix(h, params, wts, errorNodesWts = NULL, ...)
 }
 \arguments{
 \item{h}{Function for which the expectation should be taken.  The function 
@@ -17,6 +17,10 @@ match the number of mixture components \eqn{k}.}
 
 \item{wts}{vector of weights for each mixture component}
 
+\item{errorNodesWts}{list with elements \code{inds} and \code{weights} that 
+point out which \code{params} get used to compute an approximation of the 
+quadrature error.}
+
 \item{...}{additional arguments to be passed to \code{h}}
 }
 \description{
@@ -24,31 +28,4 @@ Approximates expectations of the form
 \deqn{E[h(\theta)] = \int h(\theta) f(\theta) d\theta}
 using a weighted mixture
 \deqn{E[h(\theta)] \approx \sum_{j=1}^k h(\theta^{(k)}) w_k}
-}
-\examples{
-# evaluate mixture density at these locations
-x = seq(0, 1, length.out = 100)
-
-# density will be a mixture of beta distributions
-f = function(x, theta, log = FALSE) {
-  dbeta(x, shape1 = theta[1], shape2 = theta[2], log = log)
-}
-
-# beta parameters are randomly assigned
-params = matrix(exp(2*runif(10)), ncol=2)
-
-# mixture components are equally weighted
-wts = rep(1/nrow(params), nrow(params))
-
-# evaluate mixture density
-fmix = dmix(x = x, f = f, params = params, wts = wts)
-
-# plot mixture density
-plot(x, fmix, type='l', ylab = expression(f(x)), 
-     ylim = c(0, 4))
-
-# plot component densities
-for(i in 1:length(wts)){
-  curve(f(x, params[i,]), col = 2, add = TRUE)
-}
 }

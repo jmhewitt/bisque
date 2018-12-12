@@ -36,6 +36,10 @@ createLocScaleGrid = function(mu = 0, prec = 1, level = 2,
     grid.l = createNIGrid(dim = length(mu), level = level - 1, type = 'nHN', 
                           ndConstruction = 'sparse')
     
+    if(length(grid.l$weights) == length(grid$weights))
+      warning(paste('Quadrature approximation error may be inaccurate;',
+                'Approximation error grid may be identital to main grid.'))
+    
     # search for the lower-order nodes in the higher-order grid
     grid.l$inds = numeric(length = nrow(grid.l$nodes))
     st = 1
