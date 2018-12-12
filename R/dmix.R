@@ -25,11 +25,14 @@
 #'   mixture components \eqn{k}.
 #' @param wts vector of weights for each mixture component
 #' @param log TRUE to return the log of the mixture density
+#' @param errorNodesWts list with elements \code{inds} and \code{weights} that 
+#'   point out which \code{params} get used to compute an approximation of the 
+#'   quadrature error.
 #' @param ... additional arguments to be passed to \code{f}
 #' 
 #' @example examples/dmixEx.R
 #' 
-dmix = function(x, f, params, wts, log = FALSE, ...){
+dmix = function(x, f, params, wts, log = FALSE, errorNodesWts = NULL, ...){
   
   if(!is.matrix(x)) {
     x = matrix(x, ncol=1)
@@ -40,6 +43,7 @@ dmix = function(x, f, params, wts, log = FALSE, ...){
   }
   
   res = numeric(nrow(x))
+  if(!is.null(errorNodesWts)) { res.l = numeric(nrow(x)) }
   
   for(i in 1:length(res)) {
     # evaluate mixture components
@@ -49,7 +53,24 @@ dmix = function(x, f, params, wts, log = FALSE, ...){
     # numerically stable evaluation of mixture density on log scale
     lnk = -mean(lnf)
     res[i] = log(sum(exp(lnf + lnk) * wts)) - lnk
+    
+    if(!is.null(errorNodesWts)) {
+      lnf = lnf[errorNodesWts$inds]
+      lnk = -mean(lnf)
+      res.l[i] = log(sum(exp(lnf + lnk) * errorNodesWts$weights)) - lnk
+    }
   }
   
-  if(log) { res } else { exp(res) }
+  if(!is.null(errorNodesWts)) { 
+    if(!log) { 
+      res = exp(res)
+      res.l = exp(res.l)
+    }
+    
+    list(d = res, 
+         d.coarse = res.l, 
+         rel.err.bound = (res.l - res)/res * 100)
+  } else {
+    if(log) { res } else { exp(res) }
+  }
 }

@@ -327,14 +327,11 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   }
 
   # build and return weighted marginal posterior
-  # TODO: allow all quadError computations to be "non-redundant" in the sense that 
-  # they compute the main thing, but also provide an estimate of quad error by 
-  # re-using the quad error evaluations
   res = list(
     f = function(theta1, log = FALSE, quadError = FALSE, ...) {
       if(quadError) {
-        dmix(x = theta1, f = h, params = mix[grid$errorNodes$inds,], 
-             wts = grid$errorNodes$weights, log = log, ...)
+        dmix(x = theta1, f = h, params = mix, wts = wts, log = log, 
+             errorNodesWts = grid$errorNodes, ...)
       } else {
         dmix(x = theta1, f = h, params = mix, wts = wts, log = log, ...)
       }

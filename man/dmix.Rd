@@ -4,7 +4,7 @@
 \alias{dmix}
 \title{Evaluate a mixture density}
 \usage{
-dmix(x, f, params, wts, log = FALSE, ...)
+dmix(x, f, params, wts, log = FALSE, errorNodesWts = NULL, ...)
 }
 \arguments{
 \item{x}{Points at which the mixture should be evaluated.  If the density 
@@ -25,6 +25,10 @@ mixture components \eqn{k}.}
 \item{wts}{vector of weights for each mixture component}
 
 \item{log}{TRUE to return the log of the mixture density}
+
+\item{errorNodesWts}{list with elements \code{inds} and \code{weights} that 
+point out which \code{params} get used to compute an approximation of the 
+quadrature error.}
 
 \item{...}{additional arguments to be passed to \code{f}}
 }
