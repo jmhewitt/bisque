@@ -4,7 +4,7 @@
 \alias{emix}
 \title{Compute expectations via weighted mixtures}
 \usage{
-emix(h, params, wts, errorNodesWts = NULL, ...)
+emix(h, params, wts, ncores = 1, errorNodesWts = NULL, ...)
 }
 \arguments{
 \item{h}{Function for which the expectation should be taken.  The function 
@@ -16,6 +16,9 @@ Additional parameters may be passed to \eqn{h} via \code{...}.}
 match the number of mixture components \eqn{k}.}
 
 \item{wts}{vector of weights for each mixture component}
+
+\item{ncores}{number of cores over which to evaluate mixture.  this function
+assumes a parallel backend is already registered.}
 
 \item{errorNodesWts}{list with elements \code{inds} and \code{weights} that 
 point out which \code{params} get used to compute an approximation of the 

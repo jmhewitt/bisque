@@ -5,6 +5,8 @@
 #' using a weighted mixture
 #' \deqn{E[h(\theta)] \approx \sum_{j=1}^k h(\theta^{(k)}) w_k}
 #' 
+#' @import foreach
+#' @importFrom itertools ichunk
 #' 
 #' @export
 #' 
@@ -15,51 +17,66 @@
 #'   \eqn{h} should be evaluated.  The number of rows in \code{params} should 
 #'   match the number of mixture components \eqn{k}.
 #' @param wts vector of weights for each mixture component
+#' @param ncores number of cores over which to evaluate mixture.  this function
+#'   assumes a parallel backend is already registered.
 #' @param errorNodesWts list with elements \code{inds} and \code{weights} that 
 #'   point out which \code{params} get used to compute an approximation of the 
 #'   quadrature error.
 #' @param ... additional arguments to be passed to \code{h}
 #' 
 #' 
-emix = function(h, params, wts, errorNodesWts = NULL, ...){
+emix = function(h, params, wts, ncores = 1, errorNodesWts = NULL, ...){
   
   if(!is.matrix(params)) {
     params = matrix(params, ncol=1)
   }
   
-  # initialize posterior mean
-  h.theta = 0
-  
-  # initialize state for quadrature error bound
-  if(!is.null(errorNodesWts)) { 
-    h.theta.l = 0
-    err.ind = 1
-    next.err.ind = errorNodesWts$inds[err.ind]
-  }
-  
   # approximate expectation by summing over mixtures
-  # TODO: parallelize step
-  for(i in 1:nrow(params)) {
+  np = nrow(params)
+  chunkSize = ceiling(np/ncores)
+  res = foreach(inds = ichunk(1:np, chunkSize = chunkSize, mode = 'numeric'),
+                .combine = rbind) %dopar% {
     
-    # build posterior mean estimate
-    h.eval = h(as.numeric(params[i,]), ...)
-    h.theta = h.theta + h.eval * wts[i]
+    # initialize partial posterior mean
+    h.theta = 0
     
-    # build quadrature error bound
-    if(!is.null(errorNodesWts)) {
-      if(i == next.err.ind) {
-        
-        h.theta.l = h.theta.l + h.eval * errorNodesWts$weights[err.ind]
-        
-        err.ind = err.ind + 1
-        next.err.ind = ifelse(err.ind <= length(errorNodesWts$inds), 
-                              errorNodesWts$inds[err.ind],
-                              -1)
+    # initialize state for quadrature error bound
+    h.theta.l = 0
+    if(!is.null(errorNodesWts)) { 
+      err.ind = min(which( errorNodesWts$inds >= inds[1] ))
+      next.err.ind = errorNodesWts$inds[err.ind]
+    }   
+    
+    for(i in inds) {
+      
+      # build posterior mean estimate
+      h.eval = h(as.numeric(params[i,]), ...)
+      h.theta = h.theta + h.eval * wts[i]
+      
+      # build quadrature error bound
+      if(!is.null(errorNodesWts)) {
+        if(i == next.err.ind) {
+          
+          h.theta.l = h.theta.l + h.eval * errorNodesWts$weights[err.ind]
+          
+          err.ind = err.ind + 1
+          next.err.ind = ifelse(err.ind <= length(errorNodesWts$inds), 
+                                errorNodesWts$inds[err.ind],
+                                -1)
+        }
       }
+      
     }
     
+    # return partial results
+    matrix(c(h.theta, h.theta.l), ncol = 2)
+  
   }
-    
+  
+  # merge results
+  h.theta = sum(res[,1])
+  h.theta.l = sum(res[,2])
+  
   if(!is.null(errorNodesWts)) {
     list( E = h.theta,
           E.coarse = h.theta.l,

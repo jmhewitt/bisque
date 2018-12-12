@@ -327,6 +327,9 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   }
 
   # build and return weighted marginal posterior
+  # TODO: allow all quadError computations to be "non-redundant" in the sense that 
+  # they compute the main thing, but also provide an estimate of quad error by 
+  # re-using the quad error evaluations
   res = list(
     f = function(theta1, log = FALSE, quadError = FALSE, ...) {
       if(quadError) {
@@ -339,16 +342,19 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
     mix = mix,
     wts = wts,
     expectation = list(
-      Eh = function(h, quadError = FALSE, ...) { 
+      Eh = function(h, ncores = 1, quadError = FALSE, ...) { 
         if(quadError) {
-          emix(h, grid$nodes[grid$errorNodes$inds,], 
-               grid$errorNodes$weights, ...)
-        } else { emix(h, grid$nodes, wts, ...) }
+          emix(h = h, params = grid$nodes, wts = wts, ncores = ncores, 
+               errorNodesWts = grid$errorNodes, ...)
+        } else { 
+          emix(h = h, params = grid$nodes, wts = wts, ncores = ncores, ...) }
       },
-      Eh.precompute = function(h, quadError = FALSE, ...) { 
+      Eh.precompute = function(h, ncores = 1, quadError = FALSE, ...) { 
         if(quadError) {
-          emix(h, mix[grid$errorNodes$inds,], grid$errorNodes$weights, ...)
-        } else { emix(h, mix, wts, ...) }
+          emix(h = h, params = mix, wts = wts, ncores = ncores,
+               errorNodesWts = grid$errorNodes, ...)
+        } else { 
+          emix(h = h, params = mix, wts = wts, ncores = ncores, ...) }
       },
       grid = grid
     )
