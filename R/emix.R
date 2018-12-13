@@ -43,8 +43,13 @@ emix = function(h, params, wts, ncores = 1, errorNodesWts = NULL, ...){
     # initialize state for quadrature error bound
     h.theta.l = 0
     if(!is.null(errorNodesWts)) { 
-      err.ind = min(which( errorNodesWts$inds >= inds[1] ))
-      next.err.ind = errorNodesWts$inds[err.ind]
+      s = which( errorNodesWts$inds >= inds[1] )
+      if(length(s)>0) {
+        err.ind = min(s)
+        next.err.ind = errorNodesWts$inds[err.ind]
+      } else {
+        next.err.ind = -1
+      }
     }   
     
     for(i in inds) {
@@ -68,8 +73,7 @@ emix = function(h, params, wts, ncores = 1, errorNodesWts = NULL, ...){
       
     }
     
-    # return partial results
-    matrix(c(h.theta, h.theta.l), ncol = 2)
+    matrix(c(h.theta, h.theta.l), nrow = 1)
   
   }
   
@@ -80,7 +84,7 @@ emix = function(h, params, wts, ncores = 1, errorNodesWts = NULL, ...){
   if(!is.null(errorNodesWts)) {
     list( E = h.theta,
           E.coarse = h.theta.l,
-          rel.err.bound = (h.theta.l - h.theta)/h.theta * 100 )
+          rel.err.bound = (h.theta.l - h.theta)/h.theta * 100)
   } else {
     h.theta
   }

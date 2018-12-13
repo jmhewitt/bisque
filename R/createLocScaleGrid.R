@@ -74,10 +74,13 @@ createLocScaleGrid = function(mu = 0, prec = 1, level = 2,
   grid$d = grid$d + sum(log(diag(prec.chol)))
   
   if(quadError) {
+    # re-order lower order grid by increasing index in higher order grid
+    o = order(grid.l$inds)
+    
     # save approximation error grid inside the main grid
     grid$errorNodes = list(
-      inds = grid.l$inds,
-      weights = grid.l$weights
+      inds = grid.l$inds[o],
+      weights = grid.l$weights[o]
     )
   }
 
