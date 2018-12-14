@@ -24,13 +24,17 @@
 #'   element of theta2.  Jacobian functions for the transformations will 
 #'   automatically be added to the optimization and integration routines.
 #'   currently supported link functions are 'log', 'logit', and 'identity'.
+#' @param quadError TRUE if integration nodes and weight should be computed for
+#'  the \code{level-1} integration grid, so that quadrature approximation
+#'  error can be estimated.
 #' @param ... additional arguments to pass to \code{f}
 #' 
 #' @examples
 #' kCompute(dgamma, init = 1, shape=2, link='log', level = 5)
 #' 
 kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
-                    link = NULL, lower = -Inf, upper = Inf, ...) {
+                    link = NULL, lower = -Inf, upper = Inf, 
+                    quadError = FALSE, ...) {
   
   # default is identity links
   if(is.null(link)) {
@@ -49,17 +53,34 @@ kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
   }
   
   # build integration grid
-  grid = createLocScaleGrid(mu = mode$par, prec = -mode$hessian, level = level)
+  grid = createLocScaleGrid(mu = mode$par, prec = -mode$hessian, level = level,
+                            quadError = quadError)
   
   # evaluate the unnormalized log-density at integration points
   lnf = apply(grid$nodes, 1, function(x){
     f(itx(x, link), log = TRUE, ...) + sum(logjac(x, link)) })
   lnf = lnf - grid$d
-
+  
   # initialize return with scaled integration constant
   lnk = -mean(lnf)
   kC = sum(exp(lnf + lnk) * grid$weights)
   lnC = log(kC) - lnk
   
-  if(log) { lnC } else { exp(lnC) }
+  r = ifelse(log, lnC, exp(lnC))
+  
+  if(quadError) { 
+    lnf = lnf[grid$errorNodes$inds]
+    lnk = -mean(lnf)
+    kC = sum(exp(lnf + lnk) * grid$errorNodes$weights)
+    lnC.l = log(kC) - lnk
+  }
+  
+  if(quadError) {
+    r.l = ifelse(log, lnC.l, exp(lnC.l))
+    list(res = r,
+         res.coarse = r.l,
+         rel.err.bound = (r.l - r)/r * 100)
+  } else {
+    r
+  }
 }

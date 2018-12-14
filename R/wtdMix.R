@@ -135,11 +135,16 @@
 #'           posterior density \eqn{f(\theta_1|X)}.}
 #'       }}
 #'   }
+#'   
+#' @example examples/seals.R
 #'
 wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
                   w = 'direct', w.init, w.link = NULL, level = 2,
                   w.control = NULL, ncores = 1, quadError = TRUE, ...) {
 
+  # TODO: consider adding code that will add a quadrature layer to an existing 
+  # wtdMix object.  this will be an efficient way to increase quadrature level
+  
   #
   # verify we can compute a gaussian approximation to f(theta2 | X)
   #
@@ -247,13 +252,15 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   # preallocate space for C1(theta2), as necessary
   if(w.approx == FALSE) { C1 = numeric(nrow(grid$nodes)) }
 
+  op = ifelse(ncores > 1, `%dopar%`, `%do%`)
+  
   # precompute parameters and weights for posterior mixture for theta1
   p0 = f1.precompute(itx(grid$nodes[1,], f2.link), ...)
   nodes  = nrow(grid$nodes)
   chunkSize = ceiling(nodes/ncores)
-  pc = foreach(inds = ichunk(1:nodes, chunkSize = chunkSize, mode = 'numeric'),
+  pc = op(foreach(inds = ichunk(1:nodes, chunkSize = chunkSize, mode = 'numeric'),
                .combine = mergePars, 
-               .export = c('itx', 'logjac', 'kCompute')) %dopar% {
+               .export = c('itx', 'logjac', 'kCompute')), {
                              
     # initialize return objects
     mix = matrix(NA, nrow = length(inds), ncol = length(p0))
@@ -294,7 +301,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
     list(mix = mix, wts = wts, wts.e = wts.e, C1 = C1,
          nodes.backtransformed = nodes.backtransformed
     )
-  }
+  })
   
   # unwrap results
   mix = pc$mix
@@ -307,7 +314,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   if(quadError) {
     grid$errorNodes$weights = grid$errorNodes$weights *
       exp(wts[grid$errorNodes$inds]-mean(wts[grid$errorNodes$inds]))
-    grid$errorNodes$weights = 
+    grid$errorNodes$weights =
       grid$errorNodes$weights / sum(grid$errorNodes$weights)
   }
   
@@ -354,6 +361,10 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
           emix(h = h, params = mix, wts = wts, ncores = ncores, ...) }
       },
       grid = grid
+    ),
+    mode = list(
+      mode = f2.mode,
+      prec = f2.prec
     )
   )
   class(res) = 'wtdMix'

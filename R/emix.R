@@ -24,6 +24,7 @@
 #'   quadrature error.
 #' @param ... additional arguments to be passed to \code{h}
 #' 
+#' @example examples/emixEx.R
 #' 
 emix = function(h, params, wts, ncores = 1, errorNodesWts = NULL, ...){
   
@@ -31,11 +32,13 @@ emix = function(h, params, wts, ncores = 1, errorNodesWts = NULL, ...){
     params = matrix(params, ncol=1)
   }
   
+  op = ifelse(ncores > 1, `%dopar%`, `%do%`)
+  
   # approximate expectation by summing over mixtures
   np = nrow(params)
   chunkSize = ceiling(np/ncores)
-  res = foreach(inds = ichunk(1:np, chunkSize = chunkSize, mode = 'numeric'),
-                .combine = rbind) %dopar% {
+  res = op(foreach(inds = ichunk(1:np, chunkSize = chunkSize, mode = 'numeric'),
+                .combine = rbind), {
     
     # initialize partial posterior mean
     h.theta = 0
@@ -75,7 +78,7 @@ emix = function(h, params, wts, ncores = 1, errorNodesWts = NULL, ...){
     
     matrix(c(h.theta, h.theta.l), nrow = 1)
   
-  }
+  })
   
   # merge results
   h.theta = sum(res[,1])

@@ -6,7 +6,8 @@
 #'
 #' @useDynLib smolBayes, .registration = TRUE
 #' 
-
+#' @example examples/spatial.R
+#' 
 
 sFit = function(x, coords, init, nSamples, thin=1, rw.initsd=.1, inits = list(),
                 C=1, alpha=.44, priors = list(sigmasq = list(a=2, b=1), 

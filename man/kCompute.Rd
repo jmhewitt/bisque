@@ -5,7 +5,8 @@
 \title{Use sparse grid quadrature techniques to integrate (unnormalized) densities}
 \usage{
 kCompute(f, init, method = "BFGS", maxit = 10000, level = 2,
-  log = FALSE, link = NULL, lower = -Inf, upper = Inf, ...)
+  log = FALSE, link = NULL, lower = -Inf, upper = Inf,
+  quadError = FALSE, ...)
 }
 \arguments{
 \item{f}{(Unnormalized) density to integrate.
@@ -32,6 +33,10 @@ vector describes the transformations that must be applied to each
 element of theta2.  Jacobian functions for the transformations will 
 automatically be added to the optimization and integration routines.
 currently supported link functions are 'log', 'logit', and 'identity'.}
+
+\item{quadError}{TRUE if integration nodes and weight should be computed for
+the \code{level-1} integration grid, so that quadrature approximation
+error can be estimated.}
 
 \item{...}{additional arguments to pass to \code{f}}
 }

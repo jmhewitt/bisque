@@ -8,8 +8,9 @@
 #' @export
 #'
 #' @useDynLib smolBayes, .registration = TRUE
-
-
+#' 
+#' @example examples/spatial.R
+#' 
 
 sKrig = function(x, sFit, coords.krig, coords = sFit$coords, burn = 0,
                  ncores = 1) {
@@ -35,19 +36,19 @@ sKrig = function(x, sFit, coords.krig, coords = sFit$coords, burn = 0,
   nSamples = length(sFit$parameters$samples$sigmasq)
   chunkSize = ceiling((nSamples+1)/ncores)
   
-  res = foreach(inds = ichunk(1:nSamples, chunkSize = chunkSize), 
-                .combine = 'rbind', .options.multicore = mcoptions, 
-                .packages = 'Rcpp',
-                .export = c('x', 'd00', 'd01', 'd11', 'sFit')) %dorng% {
+  op = ifelse(ncores>1, `%dorng%`, `%do%`)
   
-    inds = unlist(inds)              
+  res = op(foreach(inds = ichunk(1:nSamples, chunkSize = chunkSize, 
+                              mode = 'numeric'), 
+                .combine = 'rbind', .options.multicore = mcoptions, 
+                .packages = 'Rcpp'), {
     
     .Call(`t_spredict`, as.numeric(x), as.matrix(d00), as.matrix(d01),
           as.matrix(d11), 
           as.numeric(sFit$parameters$samples$sigmasq[inds]),
           as.numeric(sFit$parameters$samples$rho[inds]),
           as.numeric(sFit$parameters$samples$nu[inds]))$x0
-  }
+  })
   
   reslist = list(
     samples = res,
