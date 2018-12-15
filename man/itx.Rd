@@ -18,6 +18,6 @@ Evaluates the inverse of the named link function at the locations
 \code{x}.
 }
 \examples{
-itx(0, 'logit')
+smolBayes:::itx(0, 'logit')
 
 }

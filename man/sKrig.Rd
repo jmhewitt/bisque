@@ -7,10 +7,31 @@
 sKrig(x, sFit, coords.krig, coords = sFit$coords, burn = 0,
   ncores = 1)
 }
+\arguments{
+\item{x}{Observation of a spatial Gaussian random field, passed as a vector}
+
+\item{sFit}{posterior samples of model parameters; output from 
+smolBayes::sFit}
+
+\item{coords.krig}{Spatial coordinates at which the field should be 
+interpolated}
+
+\item{coords}{Spatial coordinates at which observations are available}
+
+\item{burn}{number of posterior samples to discard from sFit before sampling}
+
+\item{ncores}{Kriging is done via composition sampling, which may be done in
+parallel.  \code{ncores} specifies the number of cores over which sampling 
+is done.  If \code{ncores>1}, smolBayes::sKrig assumes that a parallel 
+backend suitable for use with the foreach package is already registered.}
+}
 \description{
 Fit a spatially varying coefficient model
 }
 \examples{
+library(devtools)
+document('.')
+
 library(fields)
 
 simulate.field = function(n = 100, range = .3, smoothness = .5, phi = 1){

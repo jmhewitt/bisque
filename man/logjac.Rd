@@ -17,7 +17,7 @@ inverse link function should be evaluated.  Supports \code{'identity'},
 Wrapper to abstractly evaluate log-Jacobian functions for transforms
 }
 \examples{
-logjac(1, 'logit')
+smolBayes:::logjac(1, 'logit')
 
 }
 \seealso{

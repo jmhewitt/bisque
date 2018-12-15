@@ -2,12 +2,14 @@
 #' 
 #' Evaluates the named link function at the locations \code{x}.
 #' 
+#' @importFrom stats qlogis
+#' 
 #' @param x Values at which to evaluate the link function
 #' @param link Character vector specifying link function to evaluate.  Supports 
 #'   \code{'identity'}, \code{'log'}, and \code{'logit'}.
 #'   
 #' @examples 
-#' tx(0.5, 'logit')
+#' smolBayes:::tx(0.5, 'logit')
 #' 
 tx = function(x, link) {
   # function to apply link transformations

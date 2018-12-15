@@ -20,6 +20,6 @@ where
 \deqn{J(x) = d/dx logit^{-1}(x).}
 }
 \examples{
-jac.logit(1)
+smolBayes:::jac.logit(1)
 
 }

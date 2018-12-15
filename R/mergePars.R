@@ -2,6 +2,9 @@
 #'
 #' For use in the parallel call in wtdMix()
 #' 
+#' @param x Output from one of the parallel calls in wtdMix()
+#' @param y Another output from one of the parallel calls in wtdMix()
+#' 
 mergePars = function(x, y) {
   x$mix = rbind(x$mix, y$mix)
   x$wts = c(x$wts, y$wts)

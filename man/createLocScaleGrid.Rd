@@ -29,5 +29,5 @@ g = createLocScaleGrid(mu = c(1,0), prec = diag(c(1,.5)), level = 2 )
 
 }
 \seealso{
-\code{\link{mvQuad::createNIGrid}}
+\code{mvQuad::createNIGrid}
 }

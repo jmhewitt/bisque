@@ -3,13 +3,15 @@
 #' Evaluates the inverse of the named link function at the locations
 #' \code{x}.
 #' 
+#' @importFrom stats plogis
+#' 
 #' @param x Values at which to evaluate the inverse link function
 #' @param link Character vector specifying link function for which the 
 #'   inverse link function should be evaluated.  Supports \code{'identity'},
 #'   \code{'log'}, and \code{'logit'}.
 #'   
 #' @examples 
-#' itx(0, 'logit')
+#' smolBayes:::itx(0, 'logit')
 #' 
 itx = function(x, link) {
   # function to invert link transformations

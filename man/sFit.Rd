@@ -4,14 +4,39 @@
 \alias{sFit}
 \title{Fit a spatially varying coefficient model}
 \usage{
-sFit(x, coords, init, nSamples, thin = 1, rw.initsd = 0.1,
-  inits = list(), C = 1, alpha = 0.44, priors = list(sigmasq =
-  list(a = 2, b = 1), rho = list(L = 0, U = 1), nu = list(L = 0, U = 1)))
+sFit(x, coords, nSamples, thin = 1, rw.initsd = 0.1, inits = list(),
+  C = 1, alpha = 0.44, priors = list(sigmasq = list(a = 2, b = 1),
+  rho = list(L = 0, U = 1), nu = list(L = 0, U = 1)))
+}
+\arguments{
+\item{x}{Observation of a spatial Gaussian random field, passed as a vector}
+
+\item{coords}{Spatial coordinates of the observation}
+
+\item{nSamples}{(thinned) number of MCMC samples to generate}
+
+\item{thin}{thinning to be used within the returned MCMC samples}
+
+\item{rw.initsd}{initial standard devaition for random walk proposals.  this 
+parameter will be adaptively tuned during sampling}
+
+\item{inits}{list of initial parameters for the MCMC chain}
+
+\item{C}{scale factor used during tuning of the random walk proposal s.d.}
+
+\item{alpha}{target acceptance rate for which the random walk proposals 
+should optimize}
+
+\item{priors}{parameters to specify the prior distributions for the model}
 }
 \description{
-Fit a spatially varying coefficient model
+Uses a Gibbs sampler to estimate the parameters of a Matern covariance 
+function used to model observations from a Gaussian process with mean 0.
 }
 \examples{
+library(devtools)
+document('.')
+
 library(fields)
 
 simulate.field = function(n = 100, range = .3, smoothness = .5, phi = 1){

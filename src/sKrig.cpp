@@ -2,6 +2,9 @@
 	gibbs sampler to estimate parameters of a spatial random field.
  */
 
+// disable assertions
+#define EIGEN_NO_DEBUG
+
 #include <RcppArmadillo.h>
 #include <RcppEigen.h>
 #include "GibbsSampler.h"

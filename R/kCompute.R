@@ -6,6 +6,8 @@
 #' 
 #' @export
 #' 
+#' @importFrom stats optim
+#' 
 #' @param f (Unnormalized) density to integrate.
 #'   the function \eqn{f} should include an argument \code{log}, 
 #'   which returns \eqn{log(f(x))}.
@@ -33,8 +35,7 @@
 #' kCompute(dgamma, init = 1, shape=2, link='log', level = 5)
 #' 
 kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
-                    link = NULL, lower = -Inf, upper = Inf, 
-                    quadError = FALSE, ...) {
+                    link = NULL, quadError = FALSE, ...) {
   
   # default is identity links
   if(is.null(link)) {
@@ -45,7 +46,7 @@ kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
   mode = optim(par = tx(init, link), fn = function(par, ...) {
     f(itx(par, link), log = TRUE, ...) + sum(logjac(par, link))
   }, method = method, control = list(fnscale = -1, maxit=maxit), 
-  hessian = TRUE, lower = lower, upper = upper, ...)
+  hessian = TRUE, ...)
   
   # warn if optimization failed
   if(mode$convergence != 0) {

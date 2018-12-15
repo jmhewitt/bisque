@@ -16,6 +16,7 @@
 #'
 #' @import foreach
 #' @importFrom itertools ichunk
+#' @importFrom stats optim
 #'
 #' @export
 #'

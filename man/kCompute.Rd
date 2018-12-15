@@ -5,8 +5,7 @@
 \title{Use sparse grid quadrature techniques to integrate (unnormalized) densities}
 \usage{
 kCompute(f, init, method = "BFGS", maxit = 10000, level = 2,
-  log = FALSE, link = NULL, lower = -Inf, upper = Inf,
-  quadError = FALSE, ...)
+  log = FALSE, link = NULL, quadError = FALSE, ...)
 }
 \arguments{
 \item{f}{(Unnormalized) density to integrate.

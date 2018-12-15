@@ -16,6 +16,6 @@ tx(x, link)
 Evaluates the named link function at the locations \code{x}.
 }
 \examples{
-tx(0.5, 'logit')
+smolBayes:::tx(0.5, 'logit')
 
 }

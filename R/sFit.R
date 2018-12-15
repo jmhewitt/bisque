@@ -1,15 +1,31 @@
 #' Fit a spatially varying coefficient model
 #'
+#' Uses a Gibbs sampler to estimate the parameters of a Matern covariance 
+#' function used to model observations from a Gaussian process with mean 0.
+#' 
 #' @import Rcpp
+#' @importFrom stats dist
 #' 
 #' @export
 #'
 #' @useDynLib smolBayes, .registration = TRUE
 #' 
+#' @param x Observation of a spatial Gaussian random field, passed as a vector
+#' @param coords Spatial coordinates of the observation
+#' @param inits list of initial parameters for the MCMC chain
+#' @param nSamples (thinned) number of MCMC samples to generate
+#' @param thin thinning to be used within the returned MCMC samples
+#' @param rw.initsd initial standard devaition for random walk proposals.  this 
+#'   parameter will be adaptively tuned during sampling
+#' @param C scale factor used during tuning of the random walk proposal s.d.
+#' @param alpha target acceptance rate for which the random walk proposals 
+#'   should optimize
+#' @param priors parameters to specify the prior distributions for the model
+#' 
 #' @example examples/spatial.R
 #' 
 
-sFit = function(x, coords, init, nSamples, thin=1, rw.initsd=.1, inits = list(),
+sFit = function(x, coords, nSamples, thin=1, rw.initsd=.1, inits = list(),
                 C=1, alpha=.44, priors = list(sigmasq = list(a=2, b=1), 
                 rho = list(L=0, U=1), nu = list(L=0, U=1))) {
   

@@ -4,8 +4,21 @@
 #' @import foreach
 #' @import doRNG
 #' @importFrom itertools ichunk
+#' @importFrom stats dist
 #'
 #' @export
+#' 
+#' @param x Observation of a spatial Gaussian random field, passed as a vector
+#' @param sFit posterior samples of model parameters; output from 
+#'   smolBayes::sFit
+#' @param coords.krig Spatial coordinates at which the field should be 
+#'   interpolated
+#' @param coords Spatial coordinates at which observations are available
+#' @param burn number of posterior samples to discard from sFit before sampling
+#' @param ncores Kriging is done via composition sampling, which may be done in
+#'   parallel.  \code{ncores} specifies the number of cores over which sampling 
+#'   is done.  If \code{ncores>1}, smolBayes::sKrig assumes that a parallel 
+#'   backend suitable for use with the foreach package is already registered.
 #'
 #' @useDynLib smolBayes, .registration = TRUE
 #' 

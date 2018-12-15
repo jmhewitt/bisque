@@ -6,6 +6,11 @@
 \usage{
 mergePars(x, y)
 }
+\arguments{
+\item{x}{Output from one of the parallel calls in wtdMix()}
+
+\item{y}{Another output from one of the parallel calls in wtdMix()}
+}
 \description{
 For use in the parallel call in wtdMix()
 }

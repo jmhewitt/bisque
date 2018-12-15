@@ -6,7 +6,7 @@
 #'   \code{'log'}, and \code{'logit'}.
 #' 
 #' @examples 
-#' logjac(1, 'logit')
+#' smolBayes:::logjac(1, 'logit')
 #' 
 #' @seealso \code{\link{jac.log}}, \code{\link{jac.logit}}
 logjac = function(x, link) {

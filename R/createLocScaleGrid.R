@@ -6,6 +6,7 @@
 #' @export
 #' 
 #' @importFrom mvQuad createNIGrid
+#' @importFrom stats dnorm
 #' 
 #' @param mu location at which grid should be centered
 #' @param prec "precision matrix" associated with the integration grid.  When 
@@ -17,7 +18,7 @@
 #'   integration weights for the quadrature rule with \code{level-1}.  This 
 #'   information can facilitate approximating the quadrature error.
 #'   
-#' @seealso \code{\link{mvQuad::createNIGrid}}
+#' @seealso \code{mvQuad::createNIGrid}
 #'   
 #' @examples 
 #' g = createLocScaleGrid(mu = c(1,0), prec = diag(c(1,.5)), level = 2 )

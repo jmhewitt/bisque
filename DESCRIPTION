@@ -1,15 +1,16 @@
 Package: smolBayes
 Type: Package
-Title: What the package does (short line)
+Title: Bayesian Posterior Inference via Sparse Grid Quadrature Methods
 Version: 1.0.0
-Date: 2018-07-10
+Date: 2018-12-14
 Author: Joshua Hewitt
 Maintainer: Joshua Hewitt <joshua.hewitt@colostate.edu>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Description: Implementation of the weighted mixtures approach for computing posterior quantities in Bayesian analyses.  The weighted mixtures approach uses sparse grid quadrature methods to assist in efficiently computing posterior quantities when the number of model parameters is large.
+License: GPL-3
 RoxygenNote: 6.1.0
-Suggests: testthat
-Imports: mvQuad
+Suggests: testthat, fields
+Depends: R (>= 3.0.2)
+Imports: mvQuad, Rcpp, doRNG, foreach, itertools
 LinkingTo: Rcpp (>= 0.12.4), RcppArmadillo, RcppEigen (>= 0.3.3.3.1)
 SystemRequirements: A system with a recent-enough C++11 compiler
         (such as g++-4.8 or later).

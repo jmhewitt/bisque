@@ -13,7 +13,7 @@
 #' @param log TRUE to return \eqn{log(J(x))}
 #' 
 #' @examples 
-#' jac.logit(1)
+#' smolBayes:::jac.logit(1)
 #' 
 jac.logit = function(x, log = TRUE) {
   res = x - 2 * log(exp(x) + 1)
