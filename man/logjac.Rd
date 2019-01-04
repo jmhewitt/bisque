@@ -4,7 +4,7 @@
 \alias{logjac}
 \title{Wrapper to abstractly evaluate log-Jacobian functions for transforms}
 \usage{
-logjac(x, link)
+logjac(x, link, linkparams)
 }
 \arguments{
 \item{x}{values at which to evaluate \eqn{J(x)}}
@@ -12,12 +12,17 @@ logjac(x, link)
 \item{link}{Character vector specifying link function for which the 
 inverse link function should be evaluated.  Supports \code{'identity'},
 \code{'log'}, and \code{'logit'}.}
+
+\item{linkparams}{Optional list of additional parameters  for link functions.
+For example, the logit function can be extended to allow mappings to any 
+closed interval.  There should be one list entry for each link function.  
+Specify NA if defaults should be used.}
 }
 \description{
 Wrapper to abstractly evaluate log-Jacobian functions for transforms
 }
 \examples{
-smolBayes:::logjac(1, 'logit')
+smolBayes:::logjac(1, 'logit', list(NA))
 
 }
 \seealso{

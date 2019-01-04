@@ -5,8 +5,8 @@
 \title{Develop a weighted mixture of posteriors}
 \usage{
 wtdMix(f1, f1.precompute = function(x, ...) {     x }, f2,
-  w = "direct", w.init, w.link = NULL, level = 2, w.control = NULL,
-  ncores = 1, quadError = TRUE, ...)
+  w = "direct", w.init, w.link = NULL, w.linkparams = NULL,
+  level = 2, w.control = NULL, ncores = 1, quadError = TRUE, ...)
 }
 \arguments{
 \item{f1}{evaluates \eqn{f(\theta_1 | X, \theta_2)}.  \code{f1} must be able
@@ -66,6 +66,11 @@ described below.
       \item{\code{f1.link}}{The integration of \code{f1} will be done on
         a transformed scale.  \code{f1.link} is a character vector that
         specifies the transformations to use.}
+      \item{\code{f1.linkparams}}{Optional list of additional parameters 
+        for link functions.  For example, the logit function can be 
+        extended to allow mappings to any closed interval.  There should 
+        be one list entry for each link function.  Specify NA if no 
+        additional arguments are passed.}
        \item{\code{f1.control}}{Passes arguments to \code{optim} to
         determine the optimization scheme used.}
        \item{\code{f1.level}}{Determines the quality of the approximate
@@ -86,6 +91,11 @@ to each element of \eqn{\theta_2}.  Jacobian functions for the
 transformations will automatically be added to the optimization and
 integration routines. Currently supported link functions are \code{'log'},
 \code{'logit'}, and \code{'identity'}.}
+
+\item{w.linkparams}{Optional list of additional parameters for link 
+functions.  For example, the logit function can be extended to allow 
+mappings to any closed interval.   There should be one list entry for each 
+link function.  Specify NA if no additional arguments are passed.}
 
 \item{level}{accuracy level (typically number of grid points for the
 underlying 1D quadrature rule) [description from mvQuad::createNIGrid]}

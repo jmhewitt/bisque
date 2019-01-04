@@ -74,6 +74,11 @@
 #'         \item{\code{f1.link}}{The integration of \code{f1} will be done on
 #'           a transformed scale.  \code{f1.link} is a character vector that
 #'           specifies the transformations to use.}
+#'         \item{\code{f1.linkparams}}{Optional list of additional parameters 
+#'           for link functions.  For example, the logit function can be 
+#'           extended to allow mappings to any closed interval.  There should 
+#'           be one list entry for each link function.  Specify NA if no 
+#'           additional arguments are passed.}
 #'          \item{\code{f1.control}}{Passes arguments to \code{optim} to
 #'           determine the optimization scheme used.}
 #'          \item{\code{f1.level}}{Determines the quality of the approximate
@@ -90,6 +95,10 @@
 #'   transformations will automatically be added to the optimization and
 #'   integration routines. Currently supported link functions are \code{'log'},
 #'   \code{'logit'}, and \code{'identity'}.
+#' @param w.linkparams Optional list of additional parameters for link 
+#'   functions.  For example, the logit function can be extended to allow 
+#'   mappings to any closed interval.   There should be one list entry for each 
+#'   link function.  Specify NA if no additional arguments are passed.
 #' @param w.init initial guess for mode of \eqn{f(\theta_2 | X)}.  Default is
 #'   \code{'identity'} for all parameters.
 #' @param level accuracy level (typically number of grid points for the
@@ -140,8 +149,9 @@
 #' @example examples/seals.R
 #'
 wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
-                  w = 'direct', w.init, w.link = NULL, level = 2,
-                  w.control = NULL, ncores = 1, quadError = TRUE, ...) {
+                  w = 'direct', w.init, w.link = NULL, w.linkparams = NULL, 
+                  level = 2, w.control = NULL, ncores = 1, quadError = TRUE, 
+                  ...) {
 
   # TODO: consider adding code that will add a quadrature layer to an existing 
   # wtdMix object.  this will be an efficient way to increase quadrature level
@@ -173,12 +183,17 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
       if(is.null(w$f1.link)) {
         w$f1.link = rep('identity', length(w$f1.init))
       }
+      # default is not additional link parameters
+      if(is.null(w$f1.linkparams)) {
+        w$f1.linkparams = as.list(rep(NA, length(w$f1.init)))
+      }
       # default optim options
       if(is.null(w$f1.control)) {
         w$f1.control = list(method = 'BFGS', maxit = 5e4)
       }
       # default integration level
       if(is.null(w$f1.level)) { w$f1.level = 2 }
+      
     }
   }
 
@@ -198,6 +213,9 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
 
   # default is identity links
   if(is.null(w.link)) { w.link = rep('identity', length(w.init)) }
+  
+  # default is no additiona link parameters
+  if(is.null(w.linkparams)) { w.linkparams = as.list(rep(NA, length(w.init))) }
 
   # default optim options
   if(is.null(w.control)) { w.control = list(method = 'BFGS', maxit = 5e4) }
@@ -209,8 +227,9 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
 
   # find mode of g
 
-  g.mode = optim(par = tx(w.init,  w.link), fn = function(par) {
-    g(itx(par, w.link), log = TRUE, ...) + sum(logjac(par, w.link))
+  g.mode = optim(par = tx(w.init,  w.link, w.linkparams), fn = function(par) {
+    g(itx(par, w.link, w.linkparams), log = TRUE, ...) + 
+      sum(logjac(par, w.link, w.linkparams))
   }, method = w.control$method, hessian = TRUE,
   control = list(fnscale = -1,  maxit = w.control$maxit))
 
@@ -222,6 +241,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
     f2.mode = g.mode$par
     f2.prec = - g.mode$hessian
     f2.link = w.link
+    f2.linkparams = w.linkparams
   } else {
     if(!is.na(w$theta2.inds)) {
       f2.mode = g.mode$par[w$theta2.inds]
@@ -235,10 +255,12 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
       f2.prec = L2 - t(Delta) %*% Delta
       # f2.prec =  L2 - t(L12) %*% solve(L1) %*% L12
       f2.link = w.link[w$theta2.inds]
+      f2.linkparams = w.linkparams[w$theta2.inds]
     } else {
       f2.mode = g.mode$par
       f2.prec = - g.mode$hessian
       f2.link = w.link
+      f2.linkparams = w.linkparams
     }
   }
 
@@ -256,7 +278,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   op = ifelse(ncores > 1, `%dopar%`, `%do%`)
   
   # precompute parameters and weights for posterior mixture for theta1
-  p0 = f1.precompute(itx(grid$nodes[1,], f2.link), ...)
+  p0 = f1.precompute(itx(grid$nodes[1,], f2.link, f2.linkparams), ...)
   nodes  = nrow(grid$nodes)
   chunkSize = ceiling(nodes/ncores)
   pc = op(foreach(inds = ichunk(1:nodes, chunkSize = chunkSize, mode = 'numeric'),
@@ -272,14 +294,15 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
 
     for(i in 1:nrow(mix)) {
       # back-transform parameters
-      theta2 = as.numeric(itx(grid$nodes[inds[i],], f2.link))
+      theta2 = as.numeric(itx(grid$nodes[inds[i],], f2.link, f2.linkparams))
 
       # compute mixture parameters
       mix[i,] = f1.precompute(theta2, ...)
 
       # compute base weights (i.e., the weight function ratios)
       wts[i] = f2(theta2, log = TRUE, ...) +
-        sum(logjac(grid$nodes[inds[i],], f2.link)) - grid$d[inds[i]]
+        sum(logjac(grid$nodes[inds[i],], f2.link, f2.linkparams)) - 
+        grid$d[inds[i]]
 
       # compute weights for evaluating expectations in secondary analyses
       wts.e[i] = wts[i]
@@ -290,7 +313,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
           res = f1(theta1, theta2, log = log, ...)
           if(log) { res } else { exp(res) }
         }, init = w$f1.init, log = TRUE, level = w$f1.level, link = w$f1.link,
-        method = w$f1.control$method)
+        linkparams = w$f1.linkparams, method = w$f1.control$method)
         wts[i] = wts[i] + C1[i]
       }
 

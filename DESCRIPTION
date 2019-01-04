@@ -7,7 +7,7 @@ Author: Joshua Hewitt
 Maintainer: Joshua Hewitt <joshua.hewitt@colostate.edu>
 Description: Implementation of the weighted mixtures approach for computing posterior quantities in Bayesian analyses.  The weighted mixtures approach uses sparse grid quadrature methods to assist in efficiently computing posterior quantities when the number of model parameters is large.
 License: GPL-3
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests: testthat, fields
 Depends: R (>= 3.0.2)
 Imports: mvQuad, Rcpp, doRNG, foreach, itertools

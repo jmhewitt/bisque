@@ -26,6 +26,10 @@
 #'   element of theta2.  Jacobian functions for the transformations will 
 #'   automatically be added to the optimization and integration routines.
 #'   currently supported link functions are 'log', 'logit', and 'identity'.
+#' @param linkparams Optional list of additional parameters  for link functions.
+#'   For example, the logit function can be extended to allow mappings to any 
+#'   closed interval.  There should be one list entry for each link function.  
+#'   Specify NA if no additional arguments are passed.
 #' @param quadError TRUE if integration nodes and weight should be computed for
 #'  the \code{level-1} integration grid, so that quadrature approximation
 #'  error can be estimated.
@@ -35,16 +39,22 @@
 #' kCompute(dgamma, init = 1, shape=2, link='log', level = 5)
 #' 
 kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
-                    link = NULL, quadError = FALSE, ...) {
+                    link = NULL, linkparams = NULL, quadError = FALSE, ...) {
   
   # default is identity links
   if(is.null(link)) {
     link = rep('identity', length(init))
   }
   
+  # default is no additional link parameters
+  if(is.null(linkparams)) {
+    linkparams = as.list(rep(NA, length(init)))
+  }
+  
   # find the density's mode
-  mode = optim(par = tx(init, link), fn = function(par, ...) {
-    f(itx(par, link), log = TRUE, ...) + sum(logjac(par, link))
+  mode = optim(par = tx(init, link, linkparams), fn = function(par, ...) {
+    f(itx(par, link, linkparams), log = TRUE, ...) + 
+      sum(logjac(par, link, linkparams))
   }, method = method, control = list(fnscale = -1, maxit=maxit), 
   hessian = TRUE, ...)
   
@@ -59,7 +69,8 @@ kCompute = function(f, init, method = 'BFGS', maxit=1e4, level = 2, log = FALSE,
   
   # evaluate the unnormalized log-density at integration points
   lnf = apply(grid$nodes, 1, function(x){
-    f(itx(x, link), log = TRUE, ...) + sum(logjac(x, link)) })
+    f(itx(x, link, linkparams), log = TRUE, ...) + 
+      sum(logjac(x, link, linkparams)) })
   lnf = lnf - grid$d
   
   # initialize return with scaled integration constant

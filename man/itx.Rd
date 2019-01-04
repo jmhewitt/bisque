@@ -4,7 +4,7 @@
 \alias{itx}
 \title{Named inverse transformation functions}
 \usage{
-itx(x, link)
+itx(x, link, linkparams)
 }
 \arguments{
 \item{x}{Values at which to evaluate the inverse link function}
@@ -12,12 +12,17 @@ itx(x, link)
 \item{link}{Character vector specifying link function for which the 
 inverse link function should be evaluated.  Supports \code{'identity'},
 \code{'log'}, and \code{'logit'}.}
+
+\item{linkparams}{Optional list of additional parameters  for link functions.
+For example, the logit function can be extended to allow mappings to any 
+closed interval.  There should be one list entry for each link function.  
+Specify NA if defaults should be used.}
 }
 \description{
 Evaluates the inverse of the named link function at the locations
 \code{x}.
 }
 \examples{
-smolBayes:::itx(0, 'logit')
+smolBayes:::itx(0, 'logit', list(NA))
 
 }
