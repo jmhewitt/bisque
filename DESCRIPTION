@@ -15,3 +15,4 @@ LinkingTo: Rcpp (>= 0.12.4), RcppArmadillo, RcppEigen (>= 0.3.3.3.1)
 SystemRequirements: A system with a recent-enough C++11 compiler
         (such as g++-4.8 or later).
 NeedsCompilation: yes
+Encoding: UTF-8

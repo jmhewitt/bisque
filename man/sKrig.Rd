@@ -29,9 +29,6 @@ backend suitable for use with the foreach package is already registered.}
 Fit a spatially varying coefficient model
 }
 \examples{
-library(devtools)
-document('.')
-
 library(fields)
 
 simulate.field = function(n = 100, range = .3, smoothness = .5, phi = 1){

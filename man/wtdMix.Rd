@@ -66,10 +66,10 @@ described below.
       \item{\code{f1.link}}{The integration of \code{f1} will be done on
         a transformed scale.  \code{f1.link} is a character vector that
         specifies the transformations to use.}
-      \item{\code{f1.linkparams}}{Optional list of additional parameters 
-        for link functions.  For example, the logit function can be 
-        extended to allow mappings to any closed interval.  There should 
-        be one list entry for each link function.  Specify NA if no 
+      \item{\code{f1.linkparams}}{Optional list of additional parameters
+        for link functions.  For example, the logit function can be
+        extended to allow mappings to any closed interval.  There should
+        be one list entry for each link function.  Specify NA if no
         additional arguments are passed.}
        \item{\code{f1.control}}{Passes arguments to \code{optim} to
         determine the optimization scheme used.}
@@ -92,9 +92,9 @@ transformations will automatically be added to the optimization and
 integration routines. Currently supported link functions are \code{'log'},
 \code{'logit'}, and \code{'identity'}.}
 
-\item{w.linkparams}{Optional list of additional parameters for link 
-functions.  For example, the logit function can be extended to allow 
-mappings to any closed interval.   There should be one list entry for each 
+\item{w.linkparams}{Optional list of additional parameters for link
+functions.  For example, the logit function can be extended to allow
+mappings to any closed interval.   There should be one list entry for each
 link function.  Specify NA if no additional arguments are passed.}
 
 \item{level}{accuracy level (typically number of grid points for the
@@ -125,24 +125,24 @@ A list with class \code{wtdMix}, which contains the following items.
     \item{\code{wts}}{Integration weights for each of the mixture components.
       Some of the weights may be negative.}
     \item{\code{expectation}}{List containing additional tools for computing
-      posterior expectations of \eqn{f(\theta_2|X)}.  However, posterior 
-      expectations of \eqn{f(\theta_1|X)} can also be computed when 
+      posterior expectations of \eqn{f(\theta_2|X)}.  However, posterior
+      expectations of \eqn{f(\theta_1|X)} can also be computed when
       expectations of \eqn{f(\theta_1|\theta_2, X)} are known.  The elements
       of \code{expectation} are
       \describe{
-        \item{\code{Eh}}{Function to compute \eqn{E[h(\theta_2)|X]}.  
+        \item{\code{Eh}}{Function to compute \eqn{E[h(\theta_2)|X]}.
           \code{Eh} is callable via \code{Eh(h, ...)}, where \code{h} is a
-          function callable via \code{h(theta2, ...)} and \code{...} are 
-          additional arguments to the function.  The function \code{h} is  
+          function callable via \code{h(theta2, ...)} and \code{...} are
+          additional arguments to the function.  The function \code{h} is
           evaluated at the quadrature nodes \eqn{\theta_2^{(j)}}.}
         \item{\code{Eh.precompute}}{Exactly the same idea as \code{Eh}, but
-          the function \code{h} is evalauted at the quadrature nodes after 
+          the function \code{h} is evalauted at the quadrature nodes after
           being passed through the function \code{f1.precompute}.}
-        \item{\code{grid}}{The sparse-quadrature integration grid used.  
+        \item{\code{grid}}{The sparse-quadrature integration grid used.
           Helpful for seeing the quadrature nodes \eqn{\theta_2^{(j)}}.}
-        \item{\code{wts}}{The integration weights for approximating the 
+        \item{\code{wts}}{The integration weights for approximating the
           expectation \eqn{E[h]}.  Note that these integration weights may
-          differ from the main integration weights for evaluating the 
+          differ from the main integration weights for evaluating the
           posterior density \eqn{f(\theta_1|X)}.}
       }}
   }

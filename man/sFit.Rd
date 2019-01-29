@@ -34,9 +34,6 @@ Uses a Gibbs sampler to estimate the parameters of a Matern covariance
 function used to model observations from a Gaussian process with mean 0.
 }
 \examples{
-library(devtools)
-document('.')
-
 library(fields)
 
 simulate.field = function(n = 100, range = .3, smoothness = .5, phi = 1){

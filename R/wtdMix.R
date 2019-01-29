@@ -74,10 +74,10 @@
 #'         \item{\code{f1.link}}{The integration of \code{f1} will be done on
 #'           a transformed scale.  \code{f1.link} is a character vector that
 #'           specifies the transformations to use.}
-#'         \item{\code{f1.linkparams}}{Optional list of additional parameters 
-#'           for link functions.  For example, the logit function can be 
-#'           extended to allow mappings to any closed interval.  There should 
-#'           be one list entry for each link function.  Specify NA if no 
+#'         \item{\code{f1.linkparams}}{Optional list of additional parameters
+#'           for link functions.  For example, the logit function can be
+#'           extended to allow mappings to any closed interval.  There should
+#'           be one list entry for each link function.  Specify NA if no
 #'           additional arguments are passed.}
 #'          \item{\code{f1.control}}{Passes arguments to \code{optim} to
 #'           determine the optimization scheme used.}
@@ -95,9 +95,9 @@
 #'   transformations will automatically be added to the optimization and
 #'   integration routines. Currently supported link functions are \code{'log'},
 #'   \code{'logit'}, and \code{'identity'}.
-#' @param w.linkparams Optional list of additional parameters for link 
-#'   functions.  For example, the logit function can be extended to allow 
-#'   mappings to any closed interval.   There should be one list entry for each 
+#' @param w.linkparams Optional list of additional parameters for link
+#'   functions.  For example, the logit function can be extended to allow
+#'   mappings to any closed interval.   There should be one list entry for each
 #'   link function.  Specify NA if no additional arguments are passed.
 #' @param w.init initial guess for mode of \eqn{f(\theta_2 | X)}.  Default is
 #'   \code{'identity'} for all parameters.
@@ -124,38 +124,52 @@
 #'     \item{\code{wts}}{Integration weights for each of the mixture components.
 #'       Some of the weights may be negative.}
 #'     \item{\code{expectation}}{List containing additional tools for computing
-#'       posterior expectations of \eqn{f(\theta_2|X)}.  However, posterior 
-#'       expectations of \eqn{f(\theta_1|X)} can also be computed when 
+#'       posterior expectations of \eqn{f(\theta_2|X)}.  However, posterior
+#'       expectations of \eqn{f(\theta_1|X)} can also be computed when
 #'       expectations of \eqn{f(\theta_1|\theta_2, X)} are known.  The elements
 #'       of \code{expectation} are
 #'       \describe{
-#'         \item{\code{Eh}}{Function to compute \eqn{E[h(\theta_2)|X]}.  
+#'         \item{\code{Eh}}{Function to compute \eqn{E[h(\theta_2)|X]}.
 #'           \code{Eh} is callable via \code{Eh(h, ...)}, where \code{h} is a
-#'           function callable via \code{h(theta2, ...)} and \code{...} are 
-#'           additional arguments to the function.  The function \code{h} is  
+#'           function callable via \code{h(theta2, ...)} and \code{...} are
+#'           additional arguments to the function.  The function \code{h} is
 #'           evaluated at the quadrature nodes \eqn{\theta_2^{(j)}}.}
 #'         \item{\code{Eh.precompute}}{Exactly the same idea as \code{Eh}, but
-#'           the function \code{h} is evalauted at the quadrature nodes after 
+#'           the function \code{h} is evalauted at the quadrature nodes after
 #'           being passed through the function \code{f1.precompute}.}
-#'         \item{\code{grid}}{The sparse-quadrature integration grid used.  
+#'         \item{\code{grid}}{The sparse-quadrature integration grid used.
 #'           Helpful for seeing the quadrature nodes \eqn{\theta_2^{(j)}}.}
-#'         \item{\code{wts}}{The integration weights for approximating the 
+#'         \item{\code{wts}}{The integration weights for approximating the
 #'           expectation \eqn{E[h]}.  Note that these integration weights may
-#'           differ from the main integration weights for evaluating the 
+#'           differ from the main integration weights for evaluating the
 #'           posterior density \eqn{f(\theta_1|X)}.}
 #'       }}
 #'   }
-#'   
+#'
 #' @example examples/seals.R
 #'
 wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
-                  w = 'direct', w.init, w.link = NULL, w.linkparams = NULL, 
-                  level = 2, w.control = NULL, ncores = 1, quadError = TRUE, 
+                  w = 'direct', w.init, w.link = NULL, w.linkparams = NULL,
+                  level = 2, w.control = NULL, ncores = 1, quadError = TRUE,
                   ...) {
 
-  # TODO: consider adding code that will add a quadrature layer to an existing 
+  # TODO: consider adding code that will add a quadrature layer to an existing
   # wtdMix object.  this will be an efficient way to increase quadrature level
-  
+
+  # TODO: consider writing an updateMixtures function to allow the optimization
+  # results to be re-used when it is desired to compute a different posterior
+  # using the same optim results.  a better strategy for this might instead be
+  # to allow wtdMix to accept some results from optim and skip various
+  # initialization and optimization steps in this function, as appropriate.
+  # this would be done by modifying the w argument to allow it to directly
+  # accept some optimization and pre-computed grid components.  this might be
+  # especially desirable for other situations where users would want to use
+  # custom optimization routines, but still use wtdMix to develop the overall
+  # approximation.  part of the goal would be to more explicitly treat this
+  # function as a wrapper for a workflow, and make the individual steps more
+  # modular, so that in effect, we could pass all sorts of information
+  # (e.g., optim results with no grid, or grid + optim, etc.)
+
   #
   # verify we can compute a gaussian approximation to f(theta2 | X)
   #
@@ -193,7 +207,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
       }
       # default integration level
       if(is.null(w$f1.level)) { w$f1.level = 2 }
-      
+
     }
   }
 
@@ -213,7 +227,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
 
   # default is identity links
   if(is.null(w.link)) { w.link = rep('identity', length(w.init)) }
-  
+
   # default is no additiona link parameters
   if(is.null(w.linkparams)) { w.linkparams = as.list(rep(NA, length(w.init))) }
 
@@ -228,7 +242,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   # find mode of g
 
   g.mode = optim(par = tx(w.init,  w.link, w.linkparams), fn = function(par) {
-    g(itx(par, w.link, w.linkparams), log = TRUE, ...) + 
+    g(itx(par, w.link, w.linkparams), log = TRUE, ...) +
       sum(logjac(par, w.link, w.linkparams))
   }, method = w.control$method, hessian = TRUE,
   control = list(fnscale = -1,  maxit = w.control$maxit))
@@ -271,28 +285,29 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   # create integration grid
   grid = createLocScaleGrid(mu = f2.mode, prec = f2.prec, level = level,
                             quadError = quadError)
-  
+
   # preallocate space for C1(theta2), as necessary
   if(w.approx == FALSE) { C1 = numeric(nrow(grid$nodes)) }
 
   op = ifelse(ncores > 1, `%dopar%`, `%do%`)
-  
+
   # precompute parameters and weights for posterior mixture for theta1
   p0 = f1.precompute(itx(grid$nodes[1,], f2.link, f2.linkparams), ...)
   nodes  = nrow(grid$nodes)
   chunkSize = ceiling(nodes/ncores)
   pc = op(foreach(inds = ichunk(1:nodes, chunkSize = chunkSize, mode = 'numeric'),
-               .combine = mergePars, 
+               .combine = mergePars,
                .export = c('itx', 'logjac', 'kCompute')), {
-                             
+
     # initialize return objects
     mix = matrix(NA, nrow = length(inds), ncol = length(p0))
     wts = numeric(nrow(mix))
     wts.e = numeric(nrow(mix))
     C1 = numeric(nrow(mix))
-    nodes.backtransformed = grid$nodes[inds,]
+    nodes.backtransformed = grid$nodes[inds, , drop = FALSE]
 
     for(i in 1:nrow(mix)) {
+      
       # back-transform parameters
       theta2 = as.numeric(itx(grid$nodes[inds[i],], f2.link, f2.linkparams))
 
@@ -301,7 +316,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
 
       # compute base weights (i.e., the weight function ratios)
       wts[i] = f2(theta2, log = TRUE, ...) +
-        sum(logjac(grid$nodes[inds[i],], f2.link, f2.linkparams)) - 
+        sum(logjac(grid$nodes[inds[i],], f2.link, f2.linkparams)) -
         grid$d[inds[i]]
 
       # compute weights for evaluating expectations in secondary analyses
@@ -326,14 +341,14 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
          nodes.backtransformed = nodes.backtransformed
     )
   })
-  
+
   # unwrap results
   mix = pc$mix
   wts = pc$wts
   wts.e = pc$wts.e
   C1 = pc$C1
   grid$nodes = pc$nodes.backtransformed
-  
+
   # standardize quadError weights before the main quadrature weights
   if(quadError) {
     grid$errorNodes$weights = grid$errorNodes$weights *
@@ -341,7 +356,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
     grid$errorNodes$weights =
       grid$errorNodes$weights / sum(grid$errorNodes$weights)
   }
-  
+
   # normalize weights
   wts = exp(wts - mean(wts)) * grid$weights
   wts = wts / sum(wts)
@@ -361,7 +376,7 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
   res = list(
     f = function(theta1, log = FALSE, quadError = FALSE, ...) {
       if(quadError) {
-        dmix(x = theta1, f = h, params = mix, wts = wts, log = log, 
+        dmix(x = theta1, f = h, params = mix, wts = wts, log = log,
              errorNodesWts = grid$errorNodes, ...)
       } else {
         dmix(x = theta1, f = h, params = mix, wts = wts, log = log, ...)
@@ -370,18 +385,18 @@ wtdMix = function(f1, f1.precompute = function(x, ...){x}, f2,
     mix = mix,
     wts = wts,
     expectation = list(
-      Eh = function(h, ncores = 1, quadError = FALSE, ...) { 
+      Eh = function(h, ncores = 1, quadError = FALSE, ...) {
         if(quadError) {
-          emix(h = h, params = grid$nodes, wts = wts, ncores = ncores, 
+          emix(h = h, params = grid$nodes, wts = wts, ncores = ncores,
                errorNodesWts = grid$errorNodes, ...)
-        } else { 
+        } else {
           emix(h = h, params = grid$nodes, wts = wts, ncores = ncores, ...) }
       },
-      Eh.precompute = function(h, ncores = 1, quadError = FALSE, ...) { 
+      Eh.precompute = function(h, ncores = 1, quadError = FALSE, ...) {
         if(quadError) {
           emix(h = h, params = mix, wts = wts, ncores = ncores,
                errorNodesWts = grid$errorNodes, ...)
-        } else { 
+        } else {
           emix(h = h, params = mix, wts = wts, ncores = ncores, ...) }
       },
       grid = grid
