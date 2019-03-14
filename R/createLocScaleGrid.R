@@ -24,7 +24,7 @@
 #' g = createLocScaleGrid(mu = c(1,0), prec = diag(c(1,.5)), level = 2 )
 #' 
 createLocScaleGrid = function(mu = 0, prec = 1, level = 2, 
-                              quadError = FALSE) {
+                              quadError = FALSE, prec.chol = chol(prec)) {
   
   # determine standardized quadrature points
   grid = createNIGrid(dim = length(mu), level = level, type = 'nHN', 
@@ -69,7 +69,6 @@ createLocScaleGrid = function(mu = 0, prec = 1, level = 2,
   # evaluate the weight function at each quadrature point
   grid$d = apply(dnorm(grid$nodes, log = TRUE), 1, sum)
   # center and scale integration grid around posterior mode
-  prec.chol = chol(prec)
   grid$nodes = sweep(t(solve(prec.chol, t(grid$nodes))), 2, - mu)
   # add jacobian
   grid$d = grid$d + sum(log(diag(prec.chol)))

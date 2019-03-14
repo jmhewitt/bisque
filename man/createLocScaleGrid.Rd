@@ -4,7 +4,8 @@
 \alias{createLocScaleGrid}
 \title{Create a centered and scaled sparse integration grid}
 \usage{
-createLocScaleGrid(mu = 0, prec = 1, level = 2, quadError = FALSE)
+createLocScaleGrid(mu = 0, prec = 1, level = 2, quadError = FALSE,
+  prec.chol = chol(prec))
 }
 \arguments{
 \item{mu}{location at which grid should be centered}
