@@ -15,7 +15,7 @@
 #'   Specify NA if defaults should be used.
 #'   
 #' @examples 
-#' smolBayes:::itx(0, 'logit', list(NA))
+#' bisque:::itx(0, 'logit', list(NA))
 #' 
 itx = function(x, link, linkparams) {
   # function to invert link transformations

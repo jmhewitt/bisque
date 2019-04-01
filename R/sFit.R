@@ -1,4 +1,4 @@
-#' Fit a spatially varying coefficient model
+#' Fit a spatially mean-zero spatial Gaussian process model
 #'
 #' Uses a Gibbs sampler to estimate the parameters of a Matern covariance 
 #' function used to model observations from a Gaussian process with mean 0.
@@ -8,12 +8,12 @@
 #' 
 #' @export
 #'
-#' @useDynLib smolBayes, .registration = TRUE
+#' @useDynLib bisque, .registration = TRUE
 #' 
 #' @param x Observation of a spatial Gaussian random field, passed as a vector
 #' @param coords Spatial coordinates of the observation
-#' @param inits list of initial parameters for the MCMC chain
 #' @param nSamples (thinned) number of MCMC samples to generate
+#' @param inits list of initial parameters for the MCMC chain
 #' @param thin thinning to be used within the returned MCMC samples
 #' @param rw.initsd initial standard devaition for random walk proposals.  this 
 #'   parameter will be adaptively tuned during sampling

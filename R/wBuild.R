@@ -48,9 +48,18 @@
 #'   functions.  For example, the logit function can be extended to allow
 #'   mappings to any closed interval.   There should be one list entry for each
 #'   link function.  Specify NA if no additional arguments are passed.
+#' @param optim.control List of arguments to pass to \code{stat::optim}
+#'     when used to find mode of \code{f}.
+#'   \describe{
+#'     \item{\code{maxit}}{Maximum number of iterations to run \code{optim} 
+#'       for.}
+#'     \item{\code{method}}{Optimization routine to use with \code{optim}.}
+#'   }
 #' @param ... additional arguments needed for function evaluation.
+#' 
+#' @example examples/seals.R
 #'
-wBuild = function(f, init, dim.theta2 = length(init), approx = 'condgauss',
+wBuild = function(f, init, dim.theta2 = length(init), approx = 'gaussian',
                   link = rep('identity', length(init)),
                   link.params = rep(list(NA), length(init)),
                   optim.control = list(maxit = 5e3, method = 'BFGS'), ...) {

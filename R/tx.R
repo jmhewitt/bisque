@@ -13,7 +13,7 @@
 #'   Specify NA if defaults should be used.
 #'   
 #' @examples 
-#' smolBayes:::tx(0.5, 'logit', list(NA))
+#' bisque:::tx(0.5, 'logit', list(NA))
 #' 
 tx = function(x, link, linkparams) {
   # function to apply link transformations

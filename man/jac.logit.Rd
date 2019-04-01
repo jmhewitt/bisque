@@ -25,6 +25,6 @@ where
 \deqn{J(x) = (U-L) d/dx logit^{-1}(x).}
 }
 \examples{
-smolBayes:::jac.logit(1)
+jac.logit(1)
 
 }

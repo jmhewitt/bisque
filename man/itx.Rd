@@ -23,6 +23,6 @@ Evaluates the inverse of the named link function at the locations
 \code{x}.
 }
 \examples{
-smolBayes:::itx(0, 'logit', list(NA))
+bisque:::itx(0, 'logit', list(NA))
 
 }

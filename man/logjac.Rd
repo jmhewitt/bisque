@@ -22,7 +22,7 @@ Specify NA if defaults should be used.}
 Wrapper to abstractly evaluate log-Jacobian functions for transforms
 }
 \examples{
-smolBayes:::logjac(1, 'logit', list(NA))
+bisque:::logjac(1, 'logit', list(NA))
 
 }
 \seealso{

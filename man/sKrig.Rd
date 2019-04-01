@@ -2,7 +2,7 @@
 % Please edit documentation in R/sKrig.R
 \name{sKrig}
 \alias{sKrig}
-\title{Fit a spatially varying coefficient model}
+\title{Draw posterior predictive samples from a spatial Gaussian process model}
 \usage{
 sKrig(x, sFit, coords.krig, coords = sFit$coords, burn = 0,
   ncores = 1)
@@ -11,7 +11,7 @@ sKrig(x, sFit, coords.krig, coords = sFit$coords, burn = 0,
 \item{x}{Observation of a spatial Gaussian random field, passed as a vector}
 
 \item{sFit}{posterior samples of model parameters; output from 
-smolBayes::sFit}
+bisque::sFit}
 
 \item{coords.krig}{Spatial coordinates at which the field should be 
 interpolated}
@@ -22,11 +22,11 @@ interpolated}
 
 \item{ncores}{Kriging is done via composition sampling, which may be done in
 parallel.  \code{ncores} specifies the number of cores over which sampling 
-is done.  If \code{ncores>1}, smolBayes::sKrig assumes that a parallel 
+is done.  If \code{ncores>1}, bisque::sKrig assumes that a parallel 
 backend suitable for use with the foreach package is already registered.}
 }
 \description{
-Fit a spatially varying coefficient model
+Draw posterior predictive samples from a spatial Gaussian process model
 }
 \examples{
 library(fields)

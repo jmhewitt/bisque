@@ -1,7 +1,7 @@
 #' Data from a capture-recapture study of fur seal pups
 #'
 #' These data are used in the book "Computational Statistics" 
-#' by G.H. Givens and J.A. Hoeting.  They are discussed in Chapter 7, 
+#' by G.H. Givens and J.A. Hoeting (2013).  They are discussed in Chapter 7, 
 #' Examples 7.2,7.3,7.8, and Exercise 7.2.
 #' 
 #' As described by the authors:

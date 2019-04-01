@@ -17,7 +17,7 @@
 #'  interval, we extend it to real numbers in arbitrary closed intervals (L,U).
 #' 
 #' @examples 
-#' smolBayes:::jac.logit(1)
+#' jac.logit(1)
 #' 
 jac.logit = function(x, log = TRUE, range = c(0,1)) {
   res = x - 2 * log(exp(x) + 1)  + log(diff(range))

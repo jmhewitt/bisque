@@ -21,6 +21,6 @@ Specify NA if defaults should be used.}
 Evaluates the named link function at the locations \code{x}.
 }
 \examples{
-smolBayes:::tx(0.5, 'logit', list(NA))
+bisque:::tx(0.5, 'logit', list(NA))
 
 }

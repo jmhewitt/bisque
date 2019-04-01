@@ -2,7 +2,7 @@
 % Please edit documentation in R/sFit.R
 \name{sFit}
 \alias{sFit}
-\title{Fit a spatially varying coefficient model}
+\title{Fit a spatially mean-zero spatial Gaussian process model}
 \usage{
 sFit(x, coords, nSamples, thin = 1, rw.initsd = 0.1, inits = list(),
   C = 1, alpha = 0.44, priors = list(sigmasq = list(a = 2, b = 1),

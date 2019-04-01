@@ -10,7 +10,7 @@
 #'   Specify NA if defaults should be used.
 #'   
 #' @examples 
-#' smolBayes:::logjac(1, 'logit', list(NA))
+#' bisque:::logjac(1, 'logit', list(NA))
 #' 
 #' @seealso \code{\link{jac.log}}, \code{\link{jac.logit}}
 #' 

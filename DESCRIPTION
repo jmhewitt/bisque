@@ -1,11 +1,11 @@
-Package: smolBayes
+Package: bisque
 Type: Package
-Title: Bayesian Posterior Inference via Sparse Grid Quadrature Methods
+Title: Approximate Bayesian Inference via Sparse Grid Quadrature Evaluation (BISQuE) for Hierarchical Models
 Version: 1.0.0
-Date: 2018-12-14
+Date: 2019-04-01
 Author: Joshua Hewitt
 Maintainer: Joshua Hewitt <joshua.hewitt@colostate.edu>
-Description: Implementation of the weighted mixtures approach for computing posterior quantities in Bayesian analyses.  The weighted mixtures approach uses sparse grid quadrature methods to assist in efficiently computing posterior quantities when the number of model parameters is large.
+Description: Implementation of the BISQuE strategy for approximate Bayesian posterior inference.  BISQuE adapts sparse grid quadrature rules with conditional posterior quantities in order to approximate marginal posterior integrals.  The resulting approximations are computationally efficient for many hierarchical Bayesian models.  The BISQuE package allows approximate posterior inference for custom models; users only need to specify the conditional densities required for the approximation.
 License: GPL-3
 RoxygenNote: 6.1.1
 Suggests: testthat, fields

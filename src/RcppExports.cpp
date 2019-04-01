@@ -9,7 +9,7 @@ using namespace Rcpp;
 
 // r_maternCov
 arma::mat r_maternCov(arma::mat dist, double scale, double range, double smoothness, double nugget);
-RcppExport SEXP _smolBayes_r_maternCov(SEXP distSEXP, SEXP scaleSEXP, SEXP rangeSEXP, SEXP smoothnessSEXP, SEXP nuggetSEXP) {
+RcppExport SEXP _bisque_r_maternCov(SEXP distSEXP, SEXP scaleSEXP, SEXP rangeSEXP, SEXP smoothnessSEXP, SEXP nuggetSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -24,7 +24,7 @@ END_RCPP
 }
 // r_maternArray
 arma::vec r_maternArray(arma::vec dist, double scale, double range, double smoothness, double nugget);
-RcppExport SEXP _smolBayes_r_maternArray(SEXP distSEXP, SEXP scaleSEXP, SEXP rangeSEXP, SEXP smoothnessSEXP, SEXP nuggetSEXP) {
+RcppExport SEXP _bisque_r_maternArray(SEXP distSEXP, SEXP scaleSEXP, SEXP rangeSEXP, SEXP smoothnessSEXP, SEXP nuggetSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -42,14 +42,14 @@ RcppExport SEXP t_sfit(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEX
 RcppExport SEXP t_spredict(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_smolBayes_r_maternCov", (DL_FUNC) &_smolBayes_r_maternCov, 5},
-    {"_smolBayes_r_maternArray", (DL_FUNC) &_smolBayes_r_maternArray, 5},
+    {"_bisque_r_maternCov", (DL_FUNC) &_bisque_r_maternCov, 5},
+    {"_bisque_r_maternArray", (DL_FUNC) &_bisque_r_maternArray, 5},
     {"t_sfit",     (DL_FUNC) &t_sfit,     14},
     {"t_spredict", (DL_FUNC) &t_spredict,  7},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_smolBayes(DllInfo *dll) {
+RcppExport void R_init_bisque(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
