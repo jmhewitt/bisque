@@ -17,6 +17,7 @@
 #' @param quadError provide additional information about the grid points and 
 #'   integration weights for the quadrature rule with \code{level-1}.  This 
 #'   information can facilitate approximating the quadrature error.
+#' @param prec.chol Upper-triangular Cholesky decomposition of precision matrix.
 #'   
 #' @seealso \code{mvQuad::createNIGrid}
 #'   
