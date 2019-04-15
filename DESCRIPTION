@@ -2,7 +2,7 @@ Package: bisque
 Type: Package
 Title: Approximate Bayesian Inference via Sparse Grid Quadrature Evaluation (BISQuE) for Hierarchical Models
 Version: 1.0.0
-Date: 2019-04-01
+Date: 2019-04-15
 Author: Joshua Hewitt
 Maintainer: Joshua Hewitt <joshua.hewitt@colostate.edu>
 Description: Implementation of the BISQuE strategy for approximate Bayesian posterior inference.  BISQuE combines conditioning with sparse grid quadrature rules to approximate marginal posterior quantities of hierarchical Bayesian models.  The resulting approximations are computationally efficient for many hierarchical Bayesian models.  The BISQuE package allows approximate posterior inference for custom models; users only need to specify the conditional densities required for the approximation.
