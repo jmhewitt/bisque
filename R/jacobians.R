@@ -16,6 +16,8 @@
 #'  the logit.  While the logit is defined for real numbers in the unit 
 #'  interval, we extend it to real numbers in arbitrary closed intervals (L,U).
 #' 
+#' @export
+#' 
 #' @examples 
 #' jac.logit(1)
 #' 

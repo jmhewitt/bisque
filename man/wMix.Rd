@@ -4,12 +4,23 @@
 \alias{wMix}
 \title{Construct a weighted mixture object}
 \usage{
-wMix(f1, f2, w, f1.precompute = function(x, ...) {     x },
-  spec = "ff", level = 2, c.int = NULL, c.level = 2,
-  c.init = NULL, c.link = rep("identity", length(c.init)),
+wMix(
+  f1,
+  f2,
+  w,
+  f1.precompute = function(x, ...) {     x },
+  spec = "ff",
+  level = 2,
+  c.int = NULL,
+  c.level = 2,
+  c.init = NULL,
+  c.link = rep("identity", length(c.init)),
   c.link.params = rep(list(NA), length(c.init)),
-  c.optim.control = list(maxit = 5000, method = "BFGS"), ncores = 1,
-  quadError = TRUE, ...)
+  c.optim.control = list(maxit = 5000, method = "BFGS"),
+  ncores = 1,
+  quadError = TRUE,
+  ...
+)
 }
 \arguments{
 \item{f1}{evaluates \eqn{f(\theta_1 | X, \theta_2)}.  \code{f1} must be able

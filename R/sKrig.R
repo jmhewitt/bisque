@@ -2,7 +2,6 @@
 #'
 #' @import Rcpp
 #' @import foreach
-#' @import doRNG
 #' @importFrom itertools ichunk
 #' @importFrom stats dist
 #'
@@ -49,7 +48,7 @@ sKrig = function(x, sFit, coords.krig, coords = sFit$coords, burn = 0,
   nSamples = length(sFit$parameters$samples$sigmasq)
   chunkSize = ceiling((nSamples+1)/ncores)
   
-  op = ifelse(ncores>1, `%dorng%`, `%do%`)
+  op = ifelse(ncores>1, `%dopar%`, `%do%`)
   
   res = op(foreach(inds = ichunk(1:nSamples, chunkSize = chunkSize, 
                               mode = 'numeric'), 

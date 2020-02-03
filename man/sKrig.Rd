@@ -4,8 +4,7 @@
 \alias{sKrig}
 \title{Draw posterior predictive samples from a spatial Gaussian process model}
 \usage{
-sKrig(x, sFit, coords.krig, coords = sFit$coords, burn = 0,
-  ncores = 1)
+sKrig(x, sFit, coords.krig, coords = sFit$coords, burn = 0, ncores = 1)
 }
 \arguments{
 \item{x}{Observation of a spatial Gaussian random field, passed as a vector}

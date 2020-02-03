@@ -4,10 +4,16 @@
 \alias{wBuild}
 \title{Derive parameters for building integration grids}
 \usage{
-wBuild(f, init, dim.theta2 = length(init), approx = "gaussian",
-  link = rep("identity", length(init)), link.params = rep(list(NA),
-  length(init)), optim.control = list(maxit = 5000, method = "BFGS"),
-  ...)
+wBuild(
+  f,
+  init,
+  dim.theta2 = length(init),
+  approx = "gaussian",
+  link = rep("identity", length(init)),
+  link.params = rep(list(NA), length(init)),
+  optim.control = list(maxit = 5000, method = "BFGS"),
+  ...
+)
 }
 \arguments{
 \item{f}{function used to derive the weight function \eqn{w}.

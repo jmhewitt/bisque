@@ -4,9 +4,18 @@
 \alias{sFit}
 \title{Fit a spatially mean-zero spatial Gaussian process model}
 \usage{
-sFit(x, coords, nSamples, thin = 1, rw.initsd = 0.1, inits = list(),
-  C = 1, alpha = 0.44, priors = list(sigmasq = list(a = 2, b = 1),
-  rho = list(L = 0, U = 1), nu = list(L = 0, U = 1)))
+sFit(
+  x,
+  coords,
+  nSamples,
+  thin = 1,
+  rw.initsd = 0.1,
+  inits = list(),
+  C = 1,
+  alpha = 0.44,
+  priors = list(sigmasq = list(a = 2, b = 1), rho = list(L = 0, U = 1), nu = list(L = 0,
+    U = 1))
+)
 }
 \arguments{
 \item{x}{Observation of a spatial Gaussian random field, passed as a vector}

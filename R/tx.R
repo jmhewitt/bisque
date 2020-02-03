@@ -12,6 +12,8 @@
 #'   closed interval.  There should be one list entry for each link function.  
 #'   Specify NA if defaults should be used.
 #'   
+#' @export
+#' 
 #' @examples 
 #' bisque:::tx(0.5, 'logit', list(NA))
 #' 
