@@ -16,7 +16,7 @@
 \url{https://www.stat.colostate.edu/computationalstatistics/datasets.zip}
 }
 \usage{
-furseals
+data(furseals)
 }
 \description{
 These data are used in the book "Computational Statistics" 

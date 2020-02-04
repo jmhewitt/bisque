@@ -22,6 +22,8 @@
 #'   \item{m}{Number of newly captured pups}
 #' }
 #' 
+#' @usage data(furseals)
+#' 
 #' @source \url{https://www.stat.colostate.edu/computationalstatistics/}
 #' @source \url{https://www.stat.colostate.edu/computationalstatistics/datasets.zip}
 #' 
