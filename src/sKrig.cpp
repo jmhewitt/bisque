@@ -15,6 +15,8 @@ using namespace Rcpp;
 using namespace arma;
 using Eigen::MatrixXd;
 
+namespace {
+
 struct Data {
     MatrixXd x1; // each row has response for one location (Nx1)
 	mat  *d11,            // matrix containing interpoint distances (NxN)
@@ -131,4 +133,6 @@ RcppExport SEXP t_spredict (SEXP X1, SEXP D00, SEXP D01, SEXP D11,
 
     // return samples
     return sampler.getSamples();
+}
+
 }
